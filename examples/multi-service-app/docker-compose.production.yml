@@ -1,0 +1,16 @@
+version: '2'
+services:
+    api:
+        build: ./services/api
+
+    frontend:
+        build: ./services/frontend
+
+    proxy:
+        build: ./services/proxy
+        volumes_from:
+            - frontend
+        links:
+            - api:api
+        ports:
+            - ${PROJECT_PORT}:80

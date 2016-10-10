@@ -1,0 +1,11 @@
+FROM alpine:latest
+RUN apk add --no-cache mysql-client
+ADD ./scripts /scripts
+
+WORKDIR /scripts
+
+VOLUME /cwd
+VOLUME /data
+VOLUME /data/dump
+
+CMD ["/bin/ash"]

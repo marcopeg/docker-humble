@@ -1,0 +1,5 @@
+version: '2'
+services:
+    node:
+        volumes:
+            - ./production.html:/usr/share/nginx/html/index.html

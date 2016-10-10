@@ -1,0 +1,17 @@
+version: '1'
+
+proxy:
+    ip: 172.16.135.169
+    port: 80
+
+apps:
+    app1:
+        port: 1080
+        host: app1.docker.dev
+    app1b:
+        skip: yes
+        port: 1081
+    app2:
+        env: development
+        port: 2080
+        host: app2.docker.dev

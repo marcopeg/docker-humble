@@ -1,0 +1,6 @@
+version: '2'
+services:
+    node:
+        image: nginx
+        ports:
+            - ${PROJECT_PORT}:80

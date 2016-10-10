@@ -1,0 +1,2 @@
+export NODE_ENV="production"
+export HELLO_MSG="Production Mode"
