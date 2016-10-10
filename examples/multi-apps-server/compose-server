@@ -70,9 +70,30 @@ fi
 
 # Load Server Settings
 if [ -f $CONFIG_FILE ]; then
-    #parse_yaml server.yml && exit
-    eval $(parse_yaml server.yml)
+    #parse_yaml $CONFIG_FILE && exit
+    eval $(parse_yaml $CONFIG_FILE)
 fi
+
+[[ ! -z $PROXY_IP ]] && proxy__ip=$PROXY_IP
+[[ ! -z $PROXY_PORT ]] && proxy__port=$PROXY_PORT
+
+if [[ $proxy__ip == "0.0.0.0" ]]; then
+    echo ""
+    echo "============== WARNING ==============="
+    echo ""
+    echo "It looks like you are running on default settings,"
+    echo "the reverse proxy may not work as you expect!"
+    echo ""
+    echo "PROXY_IP:    $proxy__ip"
+    echo "PROXY_PORT:  $proxy__port"
+    echo ""
+    echo "======================================"
+    echo ""
+    exit
+fi
+
+
+
 
 # Command is mandatory
 PROJECT_CMD=$1

@@ -1,4 +1,4 @@
 node_modules
-.server/cache
+.compose-server/cache
 .env.override
 !apps/*/.env
