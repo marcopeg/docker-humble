@@ -32,6 +32,7 @@ services:
         environment:
             - WORDPRESS_DB_PASSWORD=root
 
+    # this definition has linked volumes so we can work on the scripts
     docker_utils:
         build: ../../docker-utils
         volumes:

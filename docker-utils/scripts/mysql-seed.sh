@@ -1,5 +1,7 @@
 
 
+
+
 MYSQL_HOST=${MYSQL_HOST:-mysql}
 MYSQL_USER=${MYSQL_USER:-root}
 MYSQL_PASSWORD=${MYSQL_PASSWORD:-root}
@@ -12,8 +14,19 @@ MYSQL_SEED_DB=${MYSQL_SEED_DB:-$MYSQL_DB}
 MYSQL_SEED_TARGET=${2:-$MYSQL_SEED_DB}
 
 # Compose source backup
-MYSQL_SEED_SOURCE="$MYSQL_SEED_ROOT/${1:-$MYSQL_SEED_TARGET}"
+MYSQL_SEED_SOURCE="$MYSQL_SEED_ROOT/${1:-$MYSQL_SEED_SOURCE}"
 MYSQL_SEED_FORMAT="${MYSQL_SEED_SOURCE##*.}"
+
+# Get target database name from file dump
+if [[ -z $MYSQL_SEED_TARGET ]]; then
+    MYSQL_SEED_TARGET=$(echo $(basename "$MYSQL_SEED_SOURCE") | cut -f 1 -d '.')
+fi
+
+CUSTOM_HOST="`echo $MYSQL_SEED_TARGET | grep '://' | sed -e's,^\(.*://\).*,\1,g'`"
+if [[ ! -z $CUSTOM_HOST ]]; then
+    MYSQL_HOST="${CUSTOM_HOST%???}"
+    MYSQL_SEED_TARGET=`echo $MYSQL_SEED_TARGET | sed -e s,$CUSTOM_HOST,,g`
+fi
 
 echo "======== MYSQL SEED ========"
 echo "host:      $MYSQL_HOST"
