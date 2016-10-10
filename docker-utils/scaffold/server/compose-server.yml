@@ -6,8 +6,10 @@ proxy:
 
 apps:
     app1:
+        env: default
         port: 1080
         host: app1.docker.dev
     app2:
+        env: default
         port: 2080
         host: app2.docker.dev

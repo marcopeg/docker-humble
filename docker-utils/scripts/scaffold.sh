@@ -18,5 +18,5 @@ if [[ -z $SCAFFOLD_NAME ]]; then
     exit 0
 fi
 
-echo "Run $SCAFFOLD_NAME"
+echo "Run: $SCAFFOLD_NAME"
 source /scaffold/$SCAFFOLD_NAME.sh
