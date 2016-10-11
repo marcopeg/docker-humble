@@ -63,3 +63,4 @@ We believe in time efficiency so whenever you need to start a new project, we ai
 
 - [How to use `docker-utils` in a Compose project](./docs/how-to-use-docker-utils-in-a-Compose-project.md)
 - [mysql-seed](./docs/scripts/mysql-seed.md)
+- [mysql-dump](./docs/scripts/mysql-dump.md)

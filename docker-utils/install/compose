@@ -118,7 +118,7 @@ if [[ "utils" == $PROJECT_CMD ]]; then
     WHICH_CMD="$ENV_OVERRIDE_VARS docker-compose $WHICH_COMPOSE"
 
     # compute exec mode based on the utils container status
-    UTILS_CID=$($WHICH_CMD ps -q docker_utils)
+    UTILS_CID=$($WHICH_CMD ps -q docker-utils)
     UTILS_STATUS=$(docker inspect --format="{{ .State.Running }}" $UTILS_CID)
     if [[ "true" == $UTILS_STATUS ]]; then
         EXEC_MODE="exec"
@@ -127,7 +127,7 @@ if [[ "utils" == $PROJECT_CMD ]]; then
     fi
 
     TARGET_SCRIPT="${2-seed}.sh ${@:3}"
-    WHICH_CMD="$WHICH_CMD $EXEC_MODE docker_utils /bin/ash /scripts/$TARGET_SCRIPT"
+    WHICH_CMD="$WHICH_CMD $EXEC_MODE docker-utils /bin/ash /scripts/$TARGET_SCRIPT"
 
     echo ""
     echo ">>> Docker Utils :: $TARGET_SCRIPT"

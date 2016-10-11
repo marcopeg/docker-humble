@@ -9,6 +9,5 @@ WORKDIR /scripts
 
 VOLUME /cwd
 VOLUME /data
-VOLUME /data/dump
 
 CMD ["/bin/ash"]
