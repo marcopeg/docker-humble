@@ -88,7 +88,8 @@ fi
 
 
 # Compose the `docker-compose` full instruction
-WHICH_CMD="$ENV_OVERRIDE_VARS docker-compose $WHICH_COMPOSE $@"
+WHICH_DOCKER="$ENV_OVERRIDE_VARS docker-compose $WHICH_COMPOSE"
+WHICH_CMD="$WHICH_DOCKER $@"
 
 # Info
 if [[ "info" == $PROJECT_CMD ]]; then
@@ -113,19 +114,57 @@ if [[ "info" == $PROJECT_CMD ]]; then
     exit 0
 fi
 
+
+
+function getContainerId {
+    echo $($WHICH_DOCKER ps -q $1)
+}
+
+function getContainerRunCmd {
+    STATUS=$(docker inspect --format="{{ .State.Running }}" $1)
+    if [[ "true" == $STATUS ]]; then
+        echo "exec"
+    else
+        echo "run --rm"
+    fi
+}
+
+function urlGetService {
+    SERVICE="`echo $1 | grep '://' | sed -e's,^\(.*://\).*,\1,g'`"
+    if [[ ! -z $SERVICE ]]; then
+        echo ${SERVICE%???}
+    fi
+}
+
+function urlGetPath {
+    SERVICE="`echo $1 | grep '://' | sed -e's,^\(.*://\).*,\1,g'`"
+    if [[ ! -z $SERVICE ]]; then
+        echo "/"$1 | sed -e s,$SERVICE,,g
+    fi
+}
+
+# List file system inside a container
+# ls -la container://absolute/path
+if [[ ";ls;cat;touch;rm;" == *";$PROJECT_CMD;"* ]]; then
+    # last argument is the path to ls
+    for LAST_ARG; do true; done
+
+    # middle arguments are flags to pass to ls
+    CMD_ARGS=(${@:2})
+    unset "CMD_ARGS[${#CMD_ARGS[@]}-1]"
+
+    SERVICE_NAME=$(urlGetService $LAST_ARG)
+    SERVICE_PATH=$(urlGetPath $LAST_ARG)
+    SERVICE_CID=$(getContainerId $SERVICE_NAME)
+
+    WHICH_CMD="docker run --rm --volumes-from=$SERVICE_CID busybox:latest $PROJECT_CMD $CMD_ARGS $SERVICE_PATH"
+fi
+
 # Interface to `docker-utils` image
 if [[ "utils" == $PROJECT_CMD ]]; then
     WHICH_CMD="$ENV_OVERRIDE_VARS docker-compose $WHICH_COMPOSE"
 
-    # compute exec mode based on the utils container status
-    UTILS_CID=$($WHICH_CMD ps -q docker-utils)
-    UTILS_STATUS=$(docker inspect --format="{{ .State.Running }}" $UTILS_CID)
-    if [[ "true" == $UTILS_STATUS ]]; then
-        EXEC_MODE="exec"
-    else
-        EXEC_MODE="run --rm"
-    fi
-
+    EXEC_MODE=$(getContainerRunCmd $(getContainerId docker-utils))
     TARGET_SCRIPT="${2-seed}.sh ${@:3}"
     WHICH_CMD="$WHICH_CMD $EXEC_MODE docker-utils /bin/ash /scripts/$TARGET_SCRIPT"
 
