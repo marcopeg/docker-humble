@@ -4,12 +4,12 @@
 
 
 
-## get-dir
+## fs-export
 
 Copy files from target service into the host file system:
 
 ```
-./compose add-dir blog://var/www/html/wp-content/uploads backup/uploads
+./compose utils fs-export blog://var/www/html/wp-content/uploads backup/uploads
 ```
 
 It takes the content of `/var/www/html/wp-content/uploads` of the service named `blog` and copy it recursively into `$PWD/backup/uploads`.

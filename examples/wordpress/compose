@@ -143,64 +143,83 @@ function urlGetPath {
     fi
 }
 
-# List file system inside a container
-# ls -la container://absolute/path
-if [[ ";ls;cat;touch;rm;" == *";$PROJECT_CMD;"* ]]; then
-    # last argument is the path to ls
-    for LAST_ARG; do true; done
-
-    # middle arguments are flags to pass to ls
-    CMD_ARGS=(${@:2})
-    unset "CMD_ARGS[${#CMD_ARGS[@]}-1]"
-
-    SERVICE_NAME=$(urlGetService $LAST_ARG)
-    SERVICE_PATH=$(urlGetPath $LAST_ARG)
-    SERVICE_CID=$(getContainerId $SERVICE_NAME)
-
-    WHICH_CMD="docker run --rm --volumes-from=$SERVICE_CID busybox:latest $PROJECT_CMD $CMD_ARGS $SERVICE_PATH"
-fi
-
-# Interface to backup folders from existing containers
-# backup container://absolute/path ./local-backup-folder/
-if [[ "backup" == $PROJECT_CMD ]]; then
-    SERVICE_NAME=$(urlGetService $2)
-    SERVICE_PATH=$(urlGetPath $2)
-    SERVICE_CID=$(getContainerId $SERVICE_NAME)
-
-    BACKUP_DATE=$(date "+%Y%m%d-%H%M%S")
-    BACKUP_NAME=$(echo $SERVICE_PATH | tr / .)
-    BACKUP_NAME="$SERVICE_NAME""___""${BACKUP_NAME:1}___$BACKUP_DATE.tar.gz"
-    BACKUP_NAME=${BACKUP_NAME//-./-}
-    BACKUP_TARGET="$PWD/${3:-data/backup}"
-
-    # make a nice backup structure
-    SERVICE_PATH_DIRNAME=$(dirname $SERVICE_PATH)
-    SERVICE_PATH_BASENAME=$(basename $SERVICE_PATH)
-
-    WHICH_CMD="mkdir -p $BACKUP_TARGET && docker run --rm --volumes-from=$SERVICE_CID -v=$BACKUP_TARGET:/host-working-folder busybox:latest tar cvzf /host-working-folder/$BACKUP_NAME -C $SERVICE_PATH_DIRNAME ${SERVICE_PATH_BASENAME:-.}"
-fi
-
-# Copy a folder from host fs into a target fs
-if [[ "add-dir" == $PROJECT_CMD ]]; then
-    TARGET_SERVICE=$(urlGetService $3)
-    TARGET_PATH=$(urlGetPath $3)
-    TARGET_CID=$(getContainerId $TARGET_SERVICE)
-    WHICH_CMD="docker run --rm --volumes-from=$TARGET_CID -v="$PWD/$2":/host-working-folder alpine:latest cp -rf /host-working-folder/. $TARGET_PATH"
-fi
-
-# Copy a folder from a service file system into the host
-if [[ "get-dir" == $PROJECT_CMD ]]; then
-    SOURCE_SERVICE=$(urlGetService $2)
-    SOURCE_PATH=$(urlGetPath $2)
-    SOURCE_CID=$(getContainerId $SOURCE_SERVICE)
-    TARGET_PATH="$PWD/$3"
-    WHICH_CMD="mkdir -p $TARGET_PATH && docker run --rm --volumes-from=$SOURCE_CID -v=$TARGET_PATH:/host-working-folder alpine:latest cp -rf $SOURCE_PATH/. /host-working-folder"
-fi
-
 # Interface to `docker-utils` image
 if [[ "utils" == $PROJECT_CMD ]]; then
-    WHICH_CMD="$ENV_OVERRIDE_VARS docker-compose $WHICH_COMPOSE"
+    UTILS_CMD=$2
 
+    if [[ "fs-dump" == $UTILS_CMD ]]; then
+        BACKUP_ROOT=${FS_SEED_ROOT:-data/backup}
+
+        # interpolate target service
+        SERVICE_NAME=$(urlGetService $3)
+        SERVICE_PATH=$(urlGetPath $3)
+        SERVICE_CID=$(getContainerId $SERVICE_NAME)
+
+        # compute backup file name
+        BACKUP_DATE=$(date "+%Y%m%d-%H%M%S")
+        BACKUP_NAME=$(echo $SERVICE_PATH | tr / .)
+        BACKUP_NAME="$SERVICE_NAME""___""${BACKUP_NAME:1}___$BACKUP_DATE.tar.gz"
+        BACKUP_NAME=${BACKUP_NAME//-./-}
+        BACKUP_TARGET="$PWD/$BACKUP_ROOT"
+
+        # make a nice backup structure
+        SERVICE_PATH_DIRNAME=$(dirname $SERVICE_PATH)
+        SERVICE_PATH_BASENAME=$(basename $SERVICE_PATH)
+
+        eval "mkdir -p $BACKUP_TARGET && docker run --rm --volumes-from=$SERVICE_CID -v=$BACKUP_TARGET:/host-working-folder busybox:latest tar cvzf /host-working-folder/$BACKUP_NAME -C $SERVICE_PATH_DIRNAME ${SERVICE_PATH_BASENAME:-.}"
+        exit
+    fi
+
+    if [[ "fs-seed" == $UTILS_CMD ]]; then
+        BACKUP_ROOT=${FS_SEED_ROOT:-data/backup}
+        BACKUP_FILE=${3:-$BACKUP_FILE}
+        BACKUP_PATH="$PWD/$BACKUP_ROOT/$BACKUP_FILE"
+
+        if [[ ! -f $BACKUP_PATH ]]; then
+            echo "ERROR: Backup file does not exists!"
+            exit
+        fi
+
+        # interpolate service string from backup file name
+        SERVICE_STRING=$4
+        if [[ "" == $SERVICE_STRING ]]; then
+            SERVICE_STRING=$BACKUP_FILE
+            SERVICE_STRING="`echo $SERVICE_STRING | grep '___' | sed -e's,^\(.*___\).*,\1,g'`"
+            SERVICE_STRING="${SERVICE_STRING%???}"
+            SERVICE_STRING=$(echo $SERVICE_STRING | tr . /)
+            SERVICE_STRING="${SERVICE_STRING/___/://}"
+        fi
+
+        # interpolate target service
+        SERVICE_NAME=$(urlGetService $SERVICE_STRING)
+        SERVICE_PATH=$(urlGetPath $SERVICE_STRING)
+        SERVICE_CID=$(getContainerId $SERVICE_NAME)
+
+        eval "docker run --rm --volumes-from=$SERVICE_CID -v=$BACKUP_PATH:/host-backup-source busybox:latest sh -c \"mkdir -p $SERVICE_PATH && cd $SERVICE_PATH && tar xvfz /host-backup-source\""
+        exit
+    fi
+
+    if [[ "fs-export" == $UTILS_CMD ]]; then
+        SOURCE_SERVICE=$(urlGetService $3)
+        SOURCE_PATH=$(urlGetPath $3)
+        SOURCE_CID=$(getContainerId $SOURCE_SERVICE)
+        TARGET_PATH="$PWD/$4"
+
+        eval "mkdir -p $TARGET_PATH && docker run --rm --volumes-from=$SOURCE_CID -v=$TARGET_PATH:/host-working-folder alpine:latest cp -rf $SOURCE_PATH/. /host-working-folder"
+        exit
+    fi
+
+    if [[ "fs-import" == $UTILS_CMD ]]; then
+        TARGET_SERVICE=$(urlGetService $4)
+        TARGET_PATH=$(urlGetPath $4)
+        TARGET_CID=$(getContainerId $TARGET_SERVICE)
+
+        eval "docker run --rm --volumes-from=$TARGET_CID -v="$PWD/$3":/host-working-folder alpine:latest cp -rf /host-working-folder/. $TARGET_PATH"
+        exit
+    fi
+
+    # Run scripts from docker-utils image
+    WHICH_CMD="$ENV_OVERRIDE_VARS docker-compose $WHICH_COMPOSE"
     EXEC_MODE=$(getContainerRunCmd $(getContainerId docker-utils))
     TARGET_SCRIPT="${2-seed}.sh ${@:3}"
     WHICH_CMD="$WHICH_CMD $EXEC_MODE docker-utils /bin/ash /scripts/$TARGET_SCRIPT"
