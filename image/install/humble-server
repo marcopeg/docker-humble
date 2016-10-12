@@ -114,25 +114,25 @@ if [[ "up" == $PROJECT_CMD ]]; then
     [[ $? == 1 ]] && exit $?
     $SCRIPT_PATH config generate
     $SCRIPT_PATH proxy up -d
-    $SCRIPT_PATH compose up -d
+    $SCRIPT_PATH humble up -d
     exit 0;
 fi
 
 if [[ "start" == $PROJECT_CMD ]]; then
     $SCRIPT_PATH proxy start
-    $SCRIPT_PATH compose start
+    $SCRIPT_PATH humble start
     exit 0;
 fi
 
 if [[ "stop" == $PROJECT_CMD ]]; then
     $SCRIPT_PATH proxy stop
-    $SCRIPT_PATH compose stop
+    $SCRIPT_PATH humble stop
     exit 0;
 fi
 
 if [[ "down" == $PROJECT_CMD ]]; then
     $SCRIPT_PATH proxy down
-    $SCRIPT_PATH compose down
+    $SCRIPT_PATH humble down
     exit 0;
 fi
 
@@ -337,7 +337,7 @@ fi
 # Run docker-compose over every app
 #
 
-if [[ "compose" == $PROJECT_CMD ]]; then
+if [[ "humble" == $PROJECT_CMD ]]; then
     COMPOSE_CMD=$2
     for d in apps/*/ ; do
         APP_NAME=$(basename "$d")
@@ -346,7 +346,7 @@ if [[ "compose" == $PROJECT_CMD ]]; then
             echo "Skip $d"
         else
             echo "Boot... $d"
-            ( cd $d && ./compose $COMPOSE_CMD ${@:3} )
+            ( cd $d && ./humble $COMPOSE_CMD ${@:3} )
         fi
     done
 fi
@@ -361,7 +361,7 @@ fi
 if [ ! -f $1 ]; then
     for d in apps/*/ ; do
         if [[ $d == *"$1"* ]]; then
-          ( cd $d && ./compose ${@:2} )
+          ( cd $d && ./humble ${@:2} )
           exit 0;
         fi
     done
