@@ -7,7 +7,7 @@
 # from a local ".env" file.
 #
 #     // .env
-#     PROJECT_ENV=default
+#     HUMBLE_ENV=default
 #
 #     // cli:
 #     ./humble up --->
@@ -15,7 +15,7 @@
 #
 # ----------------------
 #     // .env
-#     PROJECT_ENV=dev
+#     HUMBLE_ENV=dev
 #
 #     // cli:
 #     ./humble up --->
@@ -57,9 +57,9 @@ fi
 # this will be passed to docker-compose instruction later on
 ENV_OVERRIDE_VARS=""
 if [ -f $ENV_OVERRIDE ]; then
-    ENV_OVERRIDE_VARS=$(source $ENV_OVERRIDE && [[ ! -z ${PROJECT_ENV+x} ]] && ENV_OVERRIDE_VARS="$ENV_OVERRIDE_VARS PROJECT_ENV=$PROJECT_ENV" ; echo $ENV_OVERRIDE_VARS)
-    ENV_OVERRIDE_VARS=$(source $ENV_OVERRIDE && [[ ! -z ${PROJECT_PORT+x} ]] && ENV_OVERRIDE_VARS="$ENV_OVERRIDE_VARS PROJECT_PORT=$PROJECT_PORT" ; echo $ENV_OVERRIDE_VARS)
-    ENV_OVERRIDE_VARS=$(source $ENV_OVERRIDE && [[ ! -z ${PROJECT_HOST+x} ]] && ENV_OVERRIDE_VARS="$ENV_OVERRIDE_VARS PROJECT_HOST=$PROJECT_HOST" ; echo $ENV_OVERRIDE_VARS)
+    ENV_OVERRIDE_VARS=$(source $ENV_OVERRIDE && [[ ! -z ${HUMBLE_ENV+x} ]] && ENV_OVERRIDE_VARS="$ENV_OVERRIDE_VARS HUMBLE_ENV=$HUMBLE_ENV" ; echo $ENV_OVERRIDE_VARS)
+    ENV_OVERRIDE_VARS=$(source $ENV_OVERRIDE && [[ ! -z ${HUMBLE_PORT+x} ]] && ENV_OVERRIDE_VARS="$ENV_OVERRIDE_VARS HUMBLE_PORT=$HUMBLE_PORT" ; echo $ENV_OVERRIDE_VARS)
+    ENV_OVERRIDE_VARS=$(source $ENV_OVERRIDE && [[ ! -z ${HUMBLE_HOST+x} ]] && ENV_OVERRIDE_VARS="$ENV_OVERRIDE_VARS HUMBLE_HOST=$HUMBLE_HOST" ; echo $ENV_OVERRIDE_VARS)
 fi
 
 
@@ -77,8 +77,8 @@ WHICH_COMPOSE=""
 if [[ -f docker-compose.yml ]]; then
     WHICH_COMPOSE="-f docker-compose.yml"
 fi
-if [[ ! "default" == $PROJECT_ENV && ! -z $PROJECT_ENV ]]; then
-    EXTEND_COMPOSE="docker-compose.$PROJECT_ENV.yml"
+if [[ ! "default" == $HUMBLE_ENV && ! -z $HUMBLE_ENV ]]; then
+    EXTEND_COMPOSE="docker-compose.$HUMBLE_ENV.yml"
     if [ ! -f $EXTEND_COMPOSE ]; then
         echo "\"$EXTEND_COMPOSE\" not found!"
         exit 1
@@ -97,12 +97,12 @@ if [[ "info" == $PROJECT_CMD ]]; then
     echo ""
     echo ""
     echo "================================================="
-    echo "=== COMPOSE PROJECT ============================="
+    echo "=== HUMBLE PROJECT =============================="
     echo "================================================="
     echo ""
-    echo "PROJECT_ENV: $PROJECT_ENV"
-    echo "PROJECT_PORT: $PROJECT_PORT"
-    echo "PROJECT_HOST: $PROJECT_HOST"
+    echo "HUMBLE_ENV: $HUMBLE_ENV"
+    echo "HUMBLE_PORT: $HUMBLE_PORT"
+    echo "HUMBLE_HOST: $HUMBLE_HOST"
     echo ""
     echo ">> Full docker-compose command:"
     echo ""
@@ -166,7 +166,7 @@ if [[ "utils" == $PROJECT_CMD ]]; then
         SERVICE_PATH_DIRNAME=$(dirname $SERVICE_PATH)
         SERVICE_PATH_BASENAME=$(basename $SERVICE_PATH)
 
-        eval "mkdir -p $BACKUP_TARGET && docker run --rm --volumes-from=$SERVICE_CID -v=$BACKUP_TARGET:/host-working-folder busybox:latest tar cvzf /host-working-folder/$BACKUP_NAME -C $SERVICE_PATH_DIRNAME ${SERVICE_PATH_BASENAME:-.}"
+        eval "mkdir -p $BACKUP_TARGET && docker run --rm --volumes-from=$SERVICE_CID -v=$BACKUP_TARGET:/host-working-folder marcopeg/humble tar cvzf /host-working-folder/$BACKUP_NAME -C $SERVICE_PATH_DIRNAME ${SERVICE_PATH_BASENAME:-.}"
         exit
     fi
 
@@ -195,7 +195,7 @@ if [[ "utils" == $PROJECT_CMD ]]; then
         SERVICE_PATH=$(urlGetPath $SERVICE_STRING)
         SERVICE_CID=$(getContainerId $SERVICE_NAME)
 
-        eval "docker run --rm --volumes-from=$SERVICE_CID -v=$BACKUP_PATH:/host-backup-source busybox:latest sh -c \"mkdir -p $SERVICE_PATH && cd $SERVICE_PATH && tar xvfz /host-backup-source\""
+        eval "docker run --rm --volumes-from=$SERVICE_CID -v=$BACKUP_PATH:/host-backup-source marcopeg/humble sh -c \"mkdir -p $(dirname $SERVICE_PATH) && cd $(dirname $SERVICE_PATH) && tar xvfz /host-backup-source\""
         exit
     fi
 
@@ -205,7 +205,7 @@ if [[ "utils" == $PROJECT_CMD ]]; then
         SOURCE_CID=$(getContainerId $SOURCE_SERVICE)
         TARGET_PATH="$PWD/$4"
 
-        eval "mkdir -p $TARGET_PATH && docker run --rm --volumes-from=$SOURCE_CID -v=$TARGET_PATH:/host-working-folder alpine:latest cp -rf $SOURCE_PATH/. /host-working-folder"
+        eval "mkdir -p $TARGET_PATH && docker run --rm --volumes-from=$SOURCE_CID -v=$TARGET_PATH:/host-working-folder marcopeg/humble cp -rf $SOURCE_PATH/. /host-working-folder"
         exit
     fi
 
@@ -214,15 +214,15 @@ if [[ "utils" == $PROJECT_CMD ]]; then
         TARGET_PATH=$(urlGetPath $4)
         TARGET_CID=$(getContainerId $TARGET_SERVICE)
 
-        eval "docker run --rm --volumes-from=$TARGET_CID -v="$PWD/$3":/host-working-folder alpine:latest cp -rf /host-working-folder/. $TARGET_PATH"
+        eval "docker run --rm --volumes-from=$TARGET_CID -v="$PWD/$3":/host-working-folder marcopeg/humble cp -rf /host-working-folder/. $TARGET_PATH"
         exit
     fi
 
     # Run scripts from docker-utils image
     WHICH_CMD="$ENV_OVERRIDE_VARS docker-compose $WHICH_COMPOSE"
-    EXEC_MODE=$(getContainerRunCmd $(getContainerId docker-utils))
+    EXEC_MODE=$(getContainerRunCmd $(getContainerId humble))
     TARGET_SCRIPT="${2-seed}.sh ${@:3}"
-    WHICH_CMD="$WHICH_CMD $EXEC_MODE docker-utils /bin/ash /scripts/$TARGET_SCRIPT"
+    WHICH_CMD="$WHICH_CMD $EXEC_MODE humble /bin/ash /scripts/$TARGET_SCRIPT"
 
     echo ""
     echo ">>> Docker Utils :: $TARGET_SCRIPT"

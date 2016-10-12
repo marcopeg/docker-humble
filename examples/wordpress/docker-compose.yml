@@ -6,7 +6,7 @@ services:
         links:
             - mysql:mysql
         ports:
-            - ${PROJECT_PORT}:80
+            - ${HUMBLE_PORT}:80
         environment:
             - WORDPRESS_DB_PASSWORD=root
 

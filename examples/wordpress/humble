@@ -7,7 +7,7 @@
 # from a local ".env" file.
 #
 #     // .env
-#     PROJECT_ENV=default
+#     HUMBLE_ENV=default
 #
 #     // cli:
 #     ./humble up --->
@@ -15,7 +15,7 @@
 #
 # ----------------------
 #     // .env
-#     PROJECT_ENV=dev
+#     HUMBLE_ENV=dev
 #
 #     // cli:
 #     ./humble up --->
@@ -57,9 +57,9 @@ fi
 # this will be passed to docker-compose instruction later on
 ENV_OVERRIDE_VARS=""
 if [ -f $ENV_OVERRIDE ]; then
-    ENV_OVERRIDE_VARS=$(source $ENV_OVERRIDE && [[ ! -z ${PROJECT_ENV+x} ]] && ENV_OVERRIDE_VARS="$ENV_OVERRIDE_VARS PROJECT_ENV=$PROJECT_ENV" ; echo $ENV_OVERRIDE_VARS)
-    ENV_OVERRIDE_VARS=$(source $ENV_OVERRIDE && [[ ! -z ${PROJECT_PORT+x} ]] && ENV_OVERRIDE_VARS="$ENV_OVERRIDE_VARS PROJECT_PORT=$PROJECT_PORT" ; echo $ENV_OVERRIDE_VARS)
-    ENV_OVERRIDE_VARS=$(source $ENV_OVERRIDE && [[ ! -z ${PROJECT_HOST+x} ]] && ENV_OVERRIDE_VARS="$ENV_OVERRIDE_VARS PROJECT_HOST=$PROJECT_HOST" ; echo $ENV_OVERRIDE_VARS)
+    ENV_OVERRIDE_VARS=$(source $ENV_OVERRIDE && [[ ! -z ${HUMBLE_ENV+x} ]] && ENV_OVERRIDE_VARS="$ENV_OVERRIDE_VARS HUMBLE_ENV=$HUMBLE_ENV" ; echo $ENV_OVERRIDE_VARS)
+    ENV_OVERRIDE_VARS=$(source $ENV_OVERRIDE && [[ ! -z ${HUMBLE_PORT+x} ]] && ENV_OVERRIDE_VARS="$ENV_OVERRIDE_VARS HUMBLE_PORT=$HUMBLE_PORT" ; echo $ENV_OVERRIDE_VARS)
+    ENV_OVERRIDE_VARS=$(source $ENV_OVERRIDE && [[ ! -z ${HUMBLE_HOST+x} ]] && ENV_OVERRIDE_VARS="$ENV_OVERRIDE_VARS HUMBLE_HOST=$HUMBLE_HOST" ; echo $ENV_OVERRIDE_VARS)
 fi
 
 
@@ -77,8 +77,8 @@ WHICH_COMPOSE=""
 if [[ -f docker-compose.yml ]]; then
     WHICH_COMPOSE="-f docker-compose.yml"
 fi
-if [[ ! "default" == $PROJECT_ENV && ! -z $PROJECT_ENV ]]; then
-    EXTEND_COMPOSE="docker-compose.$PROJECT_ENV.yml"
+if [[ ! "default" == $HUMBLE_ENV && ! -z $HUMBLE_ENV ]]; then
+    EXTEND_COMPOSE="docker-compose.$HUMBLE_ENV.yml"
     if [ ! -f $EXTEND_COMPOSE ]; then
         echo "\"$EXTEND_COMPOSE\" not found!"
         exit 1
@@ -97,12 +97,12 @@ if [[ "info" == $PROJECT_CMD ]]; then
     echo ""
     echo ""
     echo "================================================="
-    echo "=== COMPOSE PROJECT ============================="
+    echo "=== HUMBLE PROJECT =============================="
     echo "================================================="
     echo ""
-    echo "PROJECT_ENV: $PROJECT_ENV"
-    echo "PROJECT_PORT: $PROJECT_PORT"
-    echo "PROJECT_HOST: $PROJECT_HOST"
+    echo "HUMBLE_ENV: $HUMBLE_ENV"
+    echo "HUMBLE_PORT: $HUMBLE_PORT"
+    echo "HUMBLE_HOST: $HUMBLE_HOST"
     echo ""
     echo ">> Full docker-compose command:"
     echo ""
