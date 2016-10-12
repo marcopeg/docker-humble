@@ -180,6 +180,14 @@ if [[ "backup" == $PROJECT_CMD ]]; then
     WHICH_CMD="mkdir -p $BACKUP_TARGET && docker run --rm --volumes-from=$SERVICE_CID -v=$BACKUP_TARGET:/host-working-folder busybox:latest tar cvzf /host-working-folder/$BACKUP_NAME -C $SERVICE_PATH_DIRNAME ${SERVICE_PATH_BASENAME:-.}"
 fi
 
+# Copy a folder from host fs into a target fs
+if [[ "add-dir" == $PROJECT_CMD ]]; then
+    TARGET_SERVICE=$(urlGetService $3)
+    TARGET_PATH=$(urlGetPath $3)
+    TARGET_CID=$(getContainerId $TARGET_SERVICE)
+    WHICH_CMD="docker run --rm --volumes-from=$TARGET_CID -v="$PWD/$2":/host-working-folder alpine:latest cp -rf /host-working-folder/. $TARGET_PATH"
+fi
+
 # Interface to `docker-utils` image
 if [[ "utils" == $PROJECT_CMD ]]; then
     WHICH_CMD="$ENV_OVERRIDE_VARS docker-compose $WHICH_COMPOSE"

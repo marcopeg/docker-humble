@@ -58,9 +58,9 @@ We believe in time efficiency so whenever you need to start a new project, we ai
 - [multi service app](./docs/scaffolds/multi-service-app.md)
 - [multi app server](./docs/scaffolds/multi-app-server.md)
 
-
 ### Compose Utility Scripts
 
 - [How to use `docker-utils` in a Compose project](./docs/how-to-use-docker-utils-in-a-Compose-project.md)
 - [mysql-seed](./docs/scripts/mysql-seed.md)
 - [mysql-dump](./docs/scripts/mysql-dump.md)
+- [add-dir](./docs/scripts/add-dir.md)
