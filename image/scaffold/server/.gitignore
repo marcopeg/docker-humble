@@ -1,4 +1,2 @@
-node_modules
 .humble-server/cache
 .env.override
-!apps/*/.env

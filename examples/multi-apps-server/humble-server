@@ -8,7 +8,7 @@
 #
 
 # -- Custom Settings
-GIST_URL="https://raw.githubusercontent.com/marcopeg/docker-utils/master/docker-utils/install/compose-server"
+GIST_URL="https://raw.githubusercontent.com/marcopeg/docker-humble/master/image/install/humble-server"
 
 
 # -- Script Settings (you shouldn't touch it)

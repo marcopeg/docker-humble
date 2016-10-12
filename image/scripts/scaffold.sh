@@ -5,10 +5,10 @@
 SCAFFOLD_NAME=$1
 
 if [[ -z $SCAFFOLD_NAME ]]; then
-    echo "============================="
-    echo ">>> Docker Utils Scaffold <<<"
+    echo "=============================="
+    echo ">>> Docker Humble Scaffold <<<"
     echo "args: $@"
-    echo "============================="
+    echo "=============================="
     echo ""
     echo ""
     echo "Available Templates:"

@@ -3,5 +3,5 @@
 #
 
 cp -f /scaffold/server/*.*  /cwd/
-cp -rf /scaffold/server/.compose-server  /cwd/
+cp -rf /scaffold/server/.humble-server  /cwd/
 cp -rf /scaffold/server/apps  /cwd/
