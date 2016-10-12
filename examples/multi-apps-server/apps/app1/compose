@@ -1,198 +1,49 @@
 #/bin/bash
 
 #
-# Docker Compose Wrapper
-# ----------------------
-# It helps to run overrides of a basic docker compose sourcing the informations
-# from a local ".env" file.
+# Download and executes a remote GitHub gist
+# it will store a local cache to improve performances
 #
-#     // .env
-#     PROJECT_ENV=default
-#
-#     // cli:
-#     ./project up --->
-#     docker-compose -f docker-compose.yml up
-#
-# ----------------------
-#     // .env
-#     PROJECT_ENV=dev
-#
-#     // cli:
-#     ./project up --->
-#     docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
-#
-# NOTE:
-# ".env" will be sourced into the "docker-compose.yml" file too,
-# if you want to specify strings variables you need to export them:
-#
-#     export WEBSITE_TITLE="Just another Wordpress blog"
+# run `./compose --update` to flush local cache
 #
 
+# -- Custom Settings
+GIST_URL="https://raw.githubusercontent.com/marcopeg/docker-utils/master/docker-utils/install/compose"
 
-# Default name for the project environment description
-# an optional override file is also loaded, the intention is to le the
-# app to describe herself in the $ENV_CONFIG but some other changes
-# can be injected from external services like the DockerProxy project.
-ENV_CONFIG=.env
-ENV_OVERRIDE=.env.override
 
-# Validate environment
-ENV_IS_VALID=false
-[ -f $ENV_CONFIG ] && ENV_IS_VALID=true
-[ -f $ENV_OVERRIDE ] && ENV_IS_VALID=true
-if [ $ENV_IS_VALID == false ]; then
-    echo "Please create a \".env\" file to describe your environment"
-    exit 1
+# -- Script Settings (you shouldn't touch it)
+SCRIPT_NAME=$(basename "${BASH_SOURCE[0]}")
+SCRIPT_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$SCRIPT_NAME"
+CACHE_FOLDER=~/.remote-gist
+CACHE_FILE="$CACHE_FOLDER/"$SCRIPT_NAME"__$(echo $PWD | tr / .)"
+
+
+if [ ! -d $CACHE_FOLDER ]; then
+    mkdir $CACHE_FOLDER
 fi
 
-# Command is mandatory
-PROJECT_CMD=$1
-if [[ -z $PROJECT_CMD ]]; then
-    echo "Please input a command"
-    echo "[$ALLOWED_COMMANDS]"
-    exit 1
-fi
-
-# Compose the environment override string
-# this will be passed to docker-compose instruction later on
-ENV_OVERRIDE_VARS=""
-if [ -f $ENV_OVERRIDE ]; then
-    ENV_OVERRIDE_VARS=$(source $ENV_OVERRIDE && [[ ! -z ${PROJECT_ENV+x} ]] && ENV_OVERRIDE_VARS="$ENV_OVERRIDE_VARS PROJECT_ENV=$PROJECT_ENV" ; echo $ENV_OVERRIDE_VARS)
-    ENV_OVERRIDE_VARS=$(source $ENV_OVERRIDE && [[ ! -z ${PROJECT_PORT+x} ]] && ENV_OVERRIDE_VARS="$ENV_OVERRIDE_VARS PROJECT_PORT=$PROJECT_PORT" ; echo $ENV_OVERRIDE_VARS)
-    ENV_OVERRIDE_VARS=$(source $ENV_OVERRIDE && [[ ! -z ${PROJECT_HOST+x} ]] && ENV_OVERRIDE_VARS="$ENV_OVERRIDE_VARS PROJECT_HOST=$PROJECT_HOST" ; echo $ENV_OVERRIDE_VARS)
-fi
-
-
-# Get info about the current environment
-[ -f $ENV_CONFIG ] && source $ENV_CONFIG
-[ -f $ENV_OVERRIDE ] && source $ENV_OVERRIDE
-
-# Load the optional override file
-if [ -f $ENV_OVERRIDE ]; then
-    source $ENV_OVERRIDE
-fi
-
-# Generate the compose override string
-WHICH_COMPOSE=""
-if [[ -f docker-compose.yml ]]; then
-    WHICH_COMPOSE="-f docker-compose.yml"
-fi
-if [[ ! "default" == $PROJECT_ENV && ! -z $PROJECT_ENV ]]; then
-    EXTEND_COMPOSE="docker-compose.$PROJECT_ENV.yml"
-    if [ ! -f $EXTEND_COMPOSE ]; then
-        echo "\"$EXTEND_COMPOSE\" not found!"
-        exit 1
-    fi
-    WHICH_COMPOSE="$WHICH_COMPOSE -f $EXTEND_COMPOSE"
-fi
-
-
-# Compose the `docker-compose` full instruction
-WHICH_DOCKER="$ENV_OVERRIDE_VARS docker-compose $WHICH_COMPOSE"
-WHICH_CMD="$WHICH_DOCKER $@"
-
-# Info
-if [[ "info" == $PROJECT_CMD ]]; then
-    echo ""
-    echo ""
-    echo ""
-    echo "================================================="
-    echo "=== COMPOSE PROJECT ============================="
-    echo "================================================="
-    echo ""
-    echo "PROJECT_ENV: $PROJECT_ENV"
-    echo "PROJECT_PORT: $PROJECT_PORT"
-    echo "PROJECT_HOST: $PROJECT_HOST"
-    echo ""
-    echo ">> Full docker-compose command:"
-    echo ""
-    echo "    $WHICH_CMD"
-    echo ""
-    echo ""
-    echo ""
-    echo ""
+# Force update
+if [[ "--update" == $1 ]]; then
+    rm -f $CACHE_FILE
+    $SCRIPT_PATH ${@:2}
     exit 0
 fi
 
-
-
-function getContainerId {
-    echo $($WHICH_DOCKER ps -q $1)
-}
-
-function getContainerRunCmd {
-    STATUS=$(docker inspect --format="{{ .State.Running }}" $1)
-    if [[ "true" == $STATUS ]]; then
-        echo "exec"
+# Download the file
+if [ ! -f $CACHE_FILE ]; then
+    echo ""
+    echo ""
+    echo "========== RETRIEVE THE SCRIPT ==========="
+    if [ $(which wget) ] ; then
+        wget -O $CACHE_FILE $GIST_URL
     else
-        echo "run --rm"
+        curl -L -o $CACHE_FILE $GIST_URL
     fi
-}
-
-function urlGetService {
-    SERVICE="`echo $1 | grep '://' | sed -e's,^\(.*://\).*,\1,g'`"
-    if [[ ! -z $SERVICE ]]; then
-        echo ${SERVICE%???}
-    fi
-}
-
-function urlGetPath {
-    SERVICE="`echo $1 | grep '://' | sed -e's,^\(.*://\).*,\1,g'`"
-    if [[ ! -z $SERVICE ]]; then
-        echo "/"$1 | sed -e s,$SERVICE,,g
-    fi
-}
-
-# List file system inside a container
-# ls -la container://absolute/path
-if [[ ";ls;cat;touch;rm;" == *";$PROJECT_CMD;"* ]]; then
-    # last argument is the path to ls
-    for LAST_ARG; do true; done
-
-    # middle arguments are flags to pass to ls
-    CMD_ARGS=(${@:2})
-    unset "CMD_ARGS[${#CMD_ARGS[@]}-1]"
-
-    SERVICE_NAME=$(urlGetService $LAST_ARG)
-    SERVICE_PATH=$(urlGetPath $LAST_ARG)
-    SERVICE_CID=$(getContainerId $SERVICE_NAME)
-
-    WHICH_CMD="docker run --rm --volumes-from=$SERVICE_CID busybox:latest $PROJECT_CMD $CMD_ARGS $SERVICE_PATH"
-fi
-
-# Interface to backup folders from existing containers
-# backup container://absolute/path ./local-backup-folder/
-if [[ "backup" == $PROJECT_CMD ]]; then
-    SERVICE_NAME=$(urlGetService $2)
-    SERVICE_PATH=$(urlGetPath $2)
-    SERVICE_CID=$(getContainerId $SERVICE_NAME)
-
-    BACKUP_DATE=$(date "+%Y%m%d-%H%M%S")
-    BACKUP_NAME=$(echo $SERVICE_PATH | tr / .)
-    BACKUP_NAME="$SERVICE_NAME""___""${BACKUP_NAME:1}___$BACKUP_DATE.tar.gz"
-    BACKUP_NAME=${BACKUP_NAME//-./-}
-    BACKUP_TARGET="$PWD/${3:-data/backup}"
-
-    # make a nice backup structure
-    SERVICE_PATH_DIRNAME=$(dirname $SERVICE_PATH)
-    SERVICE_PATH_BASENAME=$(basename $SERVICE_PATH)
-
-    WHICH_CMD="mkdir -p $BACKUP_TARGET && docker run --rm --volumes-from=$SERVICE_CID -v=$BACKUP_TARGET:/host-working-folder busybox:latest tar cvzf /host-working-folder/$BACKUP_NAME -C $SERVICE_PATH_DIRNAME ${SERVICE_PATH_BASENAME:-.}"
-fi
-
-# Interface to `docker-utils` image
-if [[ "utils" == $PROJECT_CMD ]]; then
-    WHICH_CMD="$ENV_OVERRIDE_VARS docker-compose $WHICH_COMPOSE"
-
-    EXEC_MODE=$(getContainerRunCmd $(getContainerId docker-utils))
-    TARGET_SCRIPT="${2-seed}.sh ${@:3}"
-    WHICH_CMD="$WHICH_CMD $EXEC_MODE docker-utils /bin/ash /scripts/$TARGET_SCRIPT"
-
-    echo ""
-    echo ">>> Docker Utils :: $TARGET_SCRIPT"
+    chmod +x $CACHE_FILE
+    echo "=========================================="
     echo ""
     echo ""
 fi
 
-# Wrap docker-compose commands
-eval $WHICH_CMD
+# Execute the command
+$CACHE_FILE $@

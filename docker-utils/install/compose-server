@@ -24,8 +24,8 @@ function parse_yaml {
 
 
 # -- Script Settings (you shouldn't touch it)
-SCRIPT_ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
-SCRIPT_NAME=$(basename "${BASH_SOURCE[0]}")
+SCRIPT_ROOT=${SCRIPT_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}
+SCRIPT_NAME=${SCRIPT_NAME:-$(basename "${BASH_SOURCE[0]}")}
 SCRIPT_PATH="$SCRIPT_ROOT/$SCRIPT_NAME"
 CONFIG_ROOT=$SCRIPT_ROOT/.$SCRIPT_NAME
 TEMPLATES_ROOT=$CONFIG_ROOT/templates
