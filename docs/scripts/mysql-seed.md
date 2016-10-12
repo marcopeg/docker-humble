@@ -25,7 +25,7 @@ MYSQL_HOST              # default: mysql
 MYSQL_USER              # default: root
 MYSQL_PASSWORD          # default: root
 MYSQL_DB                # $1, default: wordpress
-MYSQL_SEED_ROOT         # default: $MYSQL_DUMP_ROOT, default: /data/mysql-dump
+MYSQL_SEED_ROOT         # default: $MYSQL_DUMP_ROOT, default: /data/backup
 MYSQL_SEED_DB           # database to seed, default: $MYSQL_DB
 ```
 

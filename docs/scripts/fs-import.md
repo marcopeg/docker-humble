@@ -4,12 +4,12 @@
 
 
 
-## add-dir
+## fs-import
 
 Copy files from host file system into a target service:
 
 ```
-./compose add-dir ./backup/uploads blog://var/www/html/wp-content/uploads
+./compose utils fs-import ./backup/uploads blog://var/www/html/wp-content/uploads
 ```
 
 It takes the content of `./backup/uploads` and copy it recursively into `/var/www/html/wp-content/uploads` of the service named `blog`.

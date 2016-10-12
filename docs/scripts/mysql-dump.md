@@ -26,7 +26,7 @@ MYSQL_HOST              # default: mysql
 MYSQL_USER              # default: root
 MYSQL_PASSWORD          # default: root
 MYSQL_DB                # $1, default: wordpress
-MYSQL_DUMP_ROOT         # default: /data/mysql-dump
+MYSQL_DUMP_ROOT         # default: /data/backup
 MYSQL_DUMP_GZIP         # yes/no, default: yes
 MYSQL_DUMP_DATE         # add date&time to file name, yes/no, default: yes
 MYSQL_DUMP_DATE_FORMAT  # default: +%Y%m%d-%H%M%S
