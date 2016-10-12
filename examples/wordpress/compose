@@ -160,18 +160,30 @@ if [[ ";ls;cat;touch;rm;" == *";$PROJECT_CMD;"* ]]; then
     WHICH_CMD="docker run --rm --volumes-from=$SERVICE_CID busybox:latest $PROJECT_CMD $CMD_ARGS $SERVICE_PATH"
 fi
 
+# Copy a folder from host fs into a target fs
+if [[ "add-dir" == $PROJECT_CMD ]]; then
+    TARGET_SERVICE=$(urlGetService $3)
+    TARGET_PATH=$(urlGetPath $3)
+    TARGET_CID=$(getContainerId $TARGET_SERVICE)
+    WHICH_CMD="docker run --rm --volumes-from=$TARGET_CID -v="$PWD/$2":/host-working-folder alpine:latest cp -rf /host-working-folder/. $TARGET_PATH"
+fi
+
 # Interface to backup folders from existing containers
 # backup container://absolute/path ./local-backup-folder/
 if [[ "backup" == $PROJECT_CMD ]]; then
+    BACKUP_ROOT=${BACKUP_SOURCE:-data/backup}
+
+    # interpolate target service
     SERVICE_NAME=$(urlGetService $2)
     SERVICE_PATH=$(urlGetPath $2)
     SERVICE_CID=$(getContainerId $SERVICE_NAME)
 
+    # compute backup file name
     BACKUP_DATE=$(date "+%Y%m%d-%H%M%S")
     BACKUP_NAME=$(echo $SERVICE_PATH | tr / .)
     BACKUP_NAME="$SERVICE_NAME""___""${BACKUP_NAME:1}___$BACKUP_DATE.tar.gz"
     BACKUP_NAME=${BACKUP_NAME//-./-}
-    BACKUP_TARGET="$PWD/${3:-data/backup}"
+    BACKUP_TARGET="$PWD/$BACKUP_ROOT"
 
     # make a nice backup structure
     SERVICE_PATH_DIRNAME=$(dirname $SERVICE_PATH)
@@ -180,12 +192,33 @@ if [[ "backup" == $PROJECT_CMD ]]; then
     WHICH_CMD="mkdir -p $BACKUP_TARGET && docker run --rm --volumes-from=$SERVICE_CID -v=$BACKUP_TARGET:/host-working-folder busybox:latest tar cvzf /host-working-folder/$BACKUP_NAME -C $SERVICE_PATH_DIRNAME ${SERVICE_PATH_BASENAME:-.}"
 fi
 
-# Copy a folder from host fs into a target fs
-if [[ "add-dir" == $PROJECT_CMD ]]; then
-    TARGET_SERVICE=$(urlGetService $3)
-    TARGET_PATH=$(urlGetPath $3)
-    TARGET_CID=$(getContainerId $TARGET_SERVICE)
-    WHICH_CMD="docker run --rm --volumes-from=$TARGET_CID -v="$PWD/$2":/host-working-folder alpine:latest cp -rf /host-working-folder/. $TARGET_PATH"
+if [[ "restore" == $PROJECT_CMD ]]; then
+    BACKUP_ROOT=${BACKUP_SOURCE:-data/backup}
+
+    BACKUP_FILE=$2
+    BACKUP_PATH="$PWD/$BACKUP_ROOT/$BACKUP_FILE"
+
+    if [[ ! -f $BACKUP_PATH ]]; then
+        echo "ERROR: Backup file does not exists!"
+        exit
+    fi
+
+    # interpolate service string from backup file name
+    SERVICE_STRING=$3
+    if [[ "" == $3 ]]; then
+        SERVICE_STRING=$BACKUP_FILE
+        SERVICE_STRING="`echo $SERVICE_STRING | grep '___' | sed -e's,^\(.*___\).*,\1,g'`"
+        SERVICE_STRING="${SERVICE_STRING%???}"
+        SERVICE_STRING=$(echo $SERVICE_STRING | tr . /)
+        SERVICE_STRING="${SERVICE_STRING/___/://}"
+    fi
+
+    # interpolate target service
+    SERVICE_NAME=$(urlGetService $SERVICE_STRING)
+    SERVICE_PATH=$(urlGetPath $SERVICE_STRING)
+    SERVICE_CID=$(getContainerId $SERVICE_NAME)
+
+    WHICH_CMD="docker run --rm --volumes-from=$SERVICE_CID -v=$BACKUP_PATH:/host-backup-source busybox:latest sh -c \"mkdir -p $SERVICE_PATH && cd $SERVICE_PATH && tar xvfz /host-backup-source\""
 fi
 
 # Copy a folder from a service file system into the host
