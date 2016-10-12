@@ -10,7 +10,7 @@
 #     PROJECT_ENV=default
 #
 #     // cli:
-#     ./project up --->
+#     ./humble up --->
 #     docker-compose -f docker-compose.yml up
 #
 # ----------------------
@@ -18,7 +18,7 @@
 #     PROJECT_ENV=dev
 #
 #     // cli:
-#     ./project up --->
+#     ./humble up --->
 #     docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
 #
 # NOTE:
@@ -166,7 +166,7 @@ if [[ "utils" == $PROJECT_CMD ]]; then
         SERVICE_PATH_DIRNAME=$(dirname $SERVICE_PATH)
         SERVICE_PATH_BASENAME=$(basename $SERVICE_PATH)
 
-        eval "mkdir -p $BACKUP_TARGET && docker run --rm --volumes-from=$SERVICE_CID -v=$BACKUP_TARGET:/host-working-folder busybox:latest tar cvzf /host-working-folder/$BACKUP_NAME -C $SERVICE_PATH_DIRNAME ${SERVICE_PATH_BASENAME:-.}"
+        eval "mkdir -p $BACKUP_TARGET && docker run --rm --volumes-from=$SERVICE_CID -v=$BACKUP_TARGET:/host-working-folder marcopeg/humble tar cvzf /host-working-folder/$BACKUP_NAME -C $SERVICE_PATH_DIRNAME ${SERVICE_PATH_BASENAME:-.}"
         exit
     fi
 
@@ -195,7 +195,7 @@ if [[ "utils" == $PROJECT_CMD ]]; then
         SERVICE_PATH=$(urlGetPath $SERVICE_STRING)
         SERVICE_CID=$(getContainerId $SERVICE_NAME)
 
-        eval "docker run --rm --volumes-from=$SERVICE_CID -v=$BACKUP_PATH:/host-backup-source busybox:latest sh -c \"mkdir -p $SERVICE_PATH && cd $SERVICE_PATH && tar xvfz /host-backup-source\""
+        eval "docker run --rm --volumes-from=$SERVICE_CID -v=$BACKUP_PATH:/host-backup-source marcopeg/humble sh -c \"mkdir -p $(dirname $SERVICE_PATH) && cd $(dirname $SERVICE_PATH) && tar xvfz /host-backup-source\""
         exit
     fi
 
@@ -205,7 +205,7 @@ if [[ "utils" == $PROJECT_CMD ]]; then
         SOURCE_CID=$(getContainerId $SOURCE_SERVICE)
         TARGET_PATH="$PWD/$4"
 
-        eval "mkdir -p $TARGET_PATH && docker run --rm --volumes-from=$SOURCE_CID -v=$TARGET_PATH:/host-working-folder alpine:latest cp -rf $SOURCE_PATH/. /host-working-folder"
+        eval "mkdir -p $TARGET_PATH && docker run --rm --volumes-from=$SOURCE_CID -v=$TARGET_PATH:/host-working-folder marcopeg/humble cp -rf $SOURCE_PATH/. /host-working-folder"
         exit
     fi
 
@@ -214,15 +214,15 @@ if [[ "utils" == $PROJECT_CMD ]]; then
         TARGET_PATH=$(urlGetPath $4)
         TARGET_CID=$(getContainerId $TARGET_SERVICE)
 
-        eval "docker run --rm --volumes-from=$TARGET_CID -v="$PWD/$3":/host-working-folder alpine:latest cp -rf /host-working-folder/. $TARGET_PATH"
+        eval "docker run --rm --volumes-from=$TARGET_CID -v="$PWD/$3":/host-working-folder marcopeg/humble cp -rf /host-working-folder/. $TARGET_PATH"
         exit
     fi
 
     # Run scripts from docker-utils image
     WHICH_CMD="$ENV_OVERRIDE_VARS docker-compose $WHICH_COMPOSE"
-    EXEC_MODE=$(getContainerRunCmd $(getContainerId docker-utils))
+    EXEC_MODE=$(getContainerRunCmd $(getContainerId humble))
     TARGET_SCRIPT="${2-seed}.sh ${@:3}"
-    WHICH_CMD="$WHICH_CMD $EXEC_MODE docker-utils /bin/ash /scripts/$TARGET_SCRIPT"
+    WHICH_CMD="$WHICH_CMD $EXEC_MODE humble /bin/ash /scripts/$TARGET_SCRIPT"
 
     echo ""
     echo ">>> Docker Utils :: $TARGET_SCRIPT"

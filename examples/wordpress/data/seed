@@ -1,0 +1,4 @@
+#/bin/bash
+
+./humble utils fs-seed seed-uploads.tar.gz blog://var/www/html/wp-content/uploads
+./humble utils mysql-seed seed-db.sql.gz mysql://wordpress

@@ -1,4 +1,4 @@
-# Docker Utils
+# Docker Humble
 > Smooth Experience for Developing and Deploying with Docker  
 > [Go to README &raquo;](../../README.md)
 
@@ -9,7 +9,7 @@
 Export a service folder into a versioned archive that can be seeded later on
 
 ```
-./compose utils fs-dump blog://var/www/html/wp-content/uploads
+./humble utils fs-dump blog://var/www/html/wp-content/uploads
 ```
 
 Will create:

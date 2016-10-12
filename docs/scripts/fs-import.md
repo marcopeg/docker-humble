@@ -1,4 +1,4 @@
-# Docker Utils
+# Docker Humble
 > Smooth Experience for Developing and Deploying with Docker  
 > [Go to README &raquo;](../../README.md)
 
@@ -9,7 +9,7 @@
 Copy files from host file system into a target service:
 
 ```
-./compose utils fs-import ./backup/uploads blog://var/www/html/wp-content/uploads
+./humble utils fs-import ./backup/uploads blog://var/www/html/wp-content/uploads
 ```
 
 It takes the content of `./backup/uploads` and copy it recursively into `/var/www/html/wp-content/uploads` of the service named `blog`.

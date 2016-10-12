@@ -1,17 +1,5 @@
 version: '2'
 services:
-    web:
-        image: nginx:latest
-        volumes:
-            - ./services/web/www:/usr/share/nginx/html
-        ports:
-            - 8080:80
-
-    mysql:
-        image: mysql:latest
-        environment:
-            - MYSQL_ROOT_PASSWORD=root
-            - MYSQL_DATABASE=wordpress
 
     pma:
         image: phpmyadmin/phpmyadmin
@@ -22,19 +10,3 @@ services:
         environment:
             - PMA_USER=root
             - PMA_PASSWORD=root
-
-    blog:
-        image: wordpress
-        links:
-            - mysql:mysql
-        ports:
-            - 8082:80
-        environment:
-            - WORDPRESS_DB_PASSWORD=root
-
-    # this definition has linked volumes so we can work on the scripts
-    docker-utils:
-        build: ../../docker-utils
-        volumes:
-            - ../../docker-utils/scripts:/scripts
-            - ./data:/data

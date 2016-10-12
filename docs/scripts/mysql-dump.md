@@ -1,4 +1,4 @@
-# Docker Utils
+# Docker Humble
 > Smooth Experience for Developing and Deploying with Docker  
 > [Go to README &raquo;](../../README.md)
 
@@ -9,14 +9,14 @@
 Dump data from `wordpress` databas in `mysql` service to `/data/mysql-dump/mysql.wordpress.20161010-153008.sql.gz` (default settings)
 
 ```
-./compose utils mysql-dump
+./humble utils mysql-dump
 ```
 
 Dump data from `typo3` database in `db2` service to `/data/mysql-dump/db2.typo3.20161010-153008.sql.gz` (default settings)
 
 
 ```
-./compose utils mysql-dump db2://typo3
+./humble utils mysql-dump db2://typo3
 ```
 
 ## Environment Variables

@@ -1,0 +1,4 @@
+#/bin/bash
+
+./humble utils fs-dump blog://var/www/html/wp-content/uploads
+./humble utils mysql-dump mysql://wordpress

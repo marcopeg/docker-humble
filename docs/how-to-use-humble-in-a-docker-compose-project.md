@@ -1,15 +1,15 @@
-# Docker Utils
+# Docker Humble
 > Smooth Experience for Developing and Deploying with Docker  
 > [Go to README &raquo;](../README.md)
 
-## How to use `docker-utils` in a Compose project:
+## How to use Humble in a Docker Compose project:
 
-Add `docker-utils` image to your `docker-compose.yml` file:
+Add `docker-humble` image to your `docker-compose.yml` file:
 
 ```
 services:
-  dockerutils:
-    image: marcopeg/docker-utils
+  humble:
+    image: marcopeg/humble
     volumes:
        - ./data:/data
 ```

@@ -1,8 +1,8 @@
 
-# Docker Utils
+# Docker Humble
 > Smooth Experience for Developing and Deploying with Docker
 
-[![Stories in Ready](https://badge.waffle.io/marcopeg/docker-utils.png?label=ready&title=Ready)](https://waffle.io/marcopeg/docker-utils)
+[![Stories in Ready](https://badge.waffle.io/marcopeg/docker-humble?label=ready&title=Ready)](https://waffle.io/marcopeg/docker-humble)
 
 ## Where is the Poo?
 
@@ -29,13 +29,13 @@ I also pulled out my wish list:
 - we should be able to run our apps in different environments easily
 
 We are still working on a solution, and we are bringing ideas and code together under this repository.  
-**And that is how `docker-utils` was born!**
+**And that is how `docker-humble` was born!**
 
 ## Mainstream Features
 
 ### For your App
 
-- use `docker-compose` commands to run your app (`./compose up`)
+- use `docker-compose` commands to run your app (`./humble up`)
 - describe different environments with different `docker-compose` files
 - use a `.env` file to tell which environment to run
 - use our utils image to run boring tasks like:
@@ -46,7 +46,7 @@ We are still working on a solution, and we are bringing ideas and code together 
 
 ### For your Server
 
-- use `docker-compose` commands to run many multi service apps (`./compose-server up`)
+- use `docker-compose` commands to run many multi service apps (`./humble-server up`)
 - use a _YAML_ config file to distribute ports and set host names for each app
 - automagically run an _NGiNX_ reverse proxy
 - achieve zero downtime when deploying new stuff (WiP)
@@ -60,7 +60,7 @@ We believe in time efficiency so whenever you need to start a new project, we ai
 
 ### Compose Utility Scripts
 
-- [How to use `docker-utils` in a Compose project](./docs/how-to-use-docker-utils-in-a-Compose-project.md)
+- [How to use `docker-humble` in a Compose project](./docs/how-to-use-humble-in-a-docker-compose-project.md)
 - [mysql-seed](./docs/scripts/mysql-seed.md)
 - [mysql-dump](./docs/scripts/mysql-dump.md)
 - [fs-seed](./docs/scripts/fs-seed.md)
