@@ -67,3 +67,4 @@ We believe in time efficiency so whenever you need to start a new project, we ai
 - [fs-dump](./docs/scripts/fs-dump.md)
 - [fs-import](./docs/scripts/fs-import.md)
 - [fs-export](./docs/scripts/fs-export.md)
+- [wp-migrate](./docs/scripts/wp-migrate.md)
