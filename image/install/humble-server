@@ -171,9 +171,9 @@ if [[ "config" == $PROJECT_CMD ]]; then
             eval APP_SKIP=\$"apps__${APP_NAME}__skip"
 
             APP_OVERRIDE=""
-            [[ $APP_ENV != "" ]] && APP_OVERRIDE="$APP_OVERRIDE""PROJECT_ENV=$APP_ENV "
-            [[ $APP_PORT != "" ]] && APP_OVERRIDE="$APP_OVERRIDE""PROJECT_PORT=$APP_PORT "
-            [[ $APP_HOST != "" ]] && APP_OVERRIDE="$APP_OVERRIDE""PROJECT_HOST=$APP_HOST "
+            [[ $APP_ENV != "" ]] && APP_OVERRIDE="$APP_OVERRIDE""HUMBLE_ENV=$APP_ENV "
+            [[ $APP_PORT != "" ]] && APP_OVERRIDE="$APP_OVERRIDE""HUMBLE_PORT=$APP_PORT "
+            [[ $APP_HOST != "" ]] && APP_OVERRIDE="$APP_OVERRIDE""HUMBLE_HOST=$APP_HOST "
 
             [[ $APP_SKIP != "yes" ]] && [[ $APP_OVERRIDE != "" ]] && echo $APP_OVERRIDE | tr ' ' '\n' > $APP_OVERRIDE_FILE
         done
@@ -192,8 +192,8 @@ if [[ "config" == $PROJECT_CMD ]]; then
 
         # Apps Virtual Host Config Files
         for d in apps/*/ ; do
-            PROJECT_HOST=""
-            PROJECT_PORT=""
+            HUMBLE_HOST=""
+            HUMBLE_PORT=""
             APP_NAME=$(basename "$d")
             eval APP_SKIP=\$"apps__${APP_NAME}__skip"
             CONFIG_FILE="$SITES_ENABLED_PATH/$(hash $d).conf"
@@ -202,23 +202,23 @@ if [[ "config" == $PROJECT_CMD ]]; then
             cp $TEMPLATES_ROOT/virtual-host.conf.tpl $CONFIG_FILE_TMP
             sed -i -e "s/\$SERVER_IP/$proxy__ip/g" $CONFIG_FILE_TMP
             sed -i -e "s/\$SERVER_PORT/$proxy__port/g" $CONFIG_FILE_TMP
-            PROJECT_HOST=$(
+            HUMBLE_HOST=$(
                 cd $d
                 [ -f .env ] && source .env
                 [ -f .env.override ] && source .env.override
-                sed -i -e "s/\$PROJECT_HOST/$PROJECT_HOST/g" $CONFIG_FILE_TMP
-                echo $PROJECT_HOST
+                sed -i -e "s/\$HUMBLE_HOST/$HUMBLE_HOST/g" $CONFIG_FILE_TMP
+                echo $HUMBLE_HOST
             )
-            PROJECT_PORT=$(
+            HUMBLE_PORT=$(
                 cd $d
                 [ -f .env ] && source .env
                 [ -f .env.override ] && source .env.override
-                sed -i -e "s/\$PROJECT_PORT/$PROJECT_PORT/g" $CONFIG_FILE_TMP
-                echo $PROJECT_PORT
+                sed -i -e "s/\$HUMBLE_PORT/$HUMBLE_PORT/g" $CONFIG_FILE_TMP
+                echo $HUMBLE_PORT
             )
             # override former configuration by removing existing virtual host
             rm -f $CONFIG_FILE
-            [[ $APP_SKIP != "yes" ]] && [[ $PROJECT_HOST != "" ]] && cat $CONFIG_FILE_TMP > $CONFIG_FILE
+            [[ $APP_SKIP != "yes" ]] && [[ $HUMBLE_HOST != "" ]] && cat $CONFIG_FILE_TMP > $CONFIG_FILE
         done
         exit 0
     fi
@@ -229,7 +229,7 @@ if [[ "config" == $PROJECT_CMD ]]; then
             APP_NAME=$(basename "$d")
             eval APP_SKIP=\$"apps__${APP_NAME}__skip"
 
-            APP_PORT_DEFAULT=$(cd $d && [ -f .env ] && source .env && echo $PROJECT_PORT)
+            APP_PORT_DEFAULT=$(cd $d && [ -f .env ] && source .env && echo $HUMBLE_PORT)
             eval APP_PORT_OVERRIDE=\$"apps__${APP_NAME}__port"
             APP_PORT=${APP_PORT_OVERRIDE:-$APP_PORT_DEFAULT}
 
@@ -259,7 +259,7 @@ if [[ "config" == $PROJECT_CMD ]]; then
             APP_NAME=$(basename "$d")
             eval APP_SKIP=\$"apps__${APP_NAME}__skip"
 
-            APP_HOST_DEFAULT=$(cd $d && [ -f .env ] && source .env && echo $PROJECT_HOST)
+            APP_HOST_DEFAULT=$(cd $d && [ -f .env ] && source .env && echo $HUMBLE_HOST)
             eval APP_HOST_OVERRIDE=\$"apps__${APP_NAME}__host"
             APP_HOST_OVERRIDE=${APP_HOST_OVERRIDE:-$APP_NAME}
             APP_HOST=${APP_HOST_OVERRIDE:-$APP_HOST_DEFAULT}
