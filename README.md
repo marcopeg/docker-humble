@@ -64,3 +64,4 @@ We believe in time efficiency so whenever you need to start a new project, we ai
 - [mysql-seed](./docs/scripts/mysql-seed.md)
 - [mysql-dump](./docs/scripts/mysql-dump.md)
 - [add-dir](./docs/scripts/add-dir.md)
+- [get-dir](./docs/scripts/get-dir.md)
