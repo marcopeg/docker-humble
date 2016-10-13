@@ -18,14 +18,14 @@ MYSQL_SEED_SOURCE="$MYSQL_SEED_ROOT/${1:-$MYSQL_SEED_SOURCE}"
 MYSQL_SEED_FORMAT="${MYSQL_SEED_SOURCE##*.}"
 
 # Get target database name from file dump (___ as separatpr)
-if [[ -z $MYSQL_SEED_TARGET_DB ]]; then
-    MYSQL_SEED_TARGET_DB=$(echo $(basename "$MYSQL_SEED_SOURCE") | cut -f 1 -d '.')
-    IMPLICIT_HOST="`echo $MYSQL_SEED_TARGET_DB | grep '___' | sed -e's,^\(.*___\).*,\1,g'`"
-    if [[ ! -z $IMPLICIT_HOST ]]; then
-        MYSQL_HOST="${IMPLICIT_HOST%???}"
-        MYSQL_SEED_TARGET_DB=`echo $MYSQL_SEED_TARGET_DB | sed -e s,$IMPLICIT_HOST,,g`
-    fi
+if [[ "" == "$MYSQL_SEED_TARGET_DB" ]]; then
+    MYSQL_SEED_TARGET_DB=$(basename "$MYSQL_SEED_SOURCE")
+    MYSQL_SEED_TARGET_DB="`echo $MYSQL_SEED_TARGET_DB | grep '___' | sed -e's,^\(.*___\).*,\1,g'`"
+    MYSQL_SEED_TARGET_DB="${MYSQL_SEED_TARGET_DB%???}"
+    MYSQL_SEED_TARGET_DB=$(echo $MYSQL_SEED_TARGET_DB | tr . /)
+    MYSQL_SEED_TARGET_DB="${MYSQL_SEED_TARGET_DB/___/://}"
 fi
+
 
 # Get explicit custom host from the command line
 CUSTOM_HOST="`echo $MYSQL_SEED_TARGET_DB | grep '://' | sed -e's,^\(.*://\).*,\1,g'`"

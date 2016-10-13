@@ -9,7 +9,7 @@
 Export a service folder into a versioned archive that can be seeded later on
 
 ```
-./humble utils fs-dump blog://var/www/html/wp-content/uploads
+./humble utils fs-dump blog://var/www/html/wp-content/uploads [fileName]
 ```
 
 Will create:

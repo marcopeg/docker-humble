@@ -163,11 +163,16 @@ if [[ "utils" == $PROJECT_CMD ]]; then
         SERVICE_CID=$(getContainerId $SERVICE_NAME)
 
         # compute backup file name
-        BACKUP_DATE=$(date "+%Y%m%d-%H%M%S")
-        BACKUP_NAME=$(echo $SERVICE_PATH | tr / .)
-        BACKUP_NAME="$SERVICE_NAME""___""${BACKUP_NAME:1}___$BACKUP_DATE.tar.gz"
-        BACKUP_NAME=${BACKUP_NAME//-./-}
         BACKUP_TARGET="$PWD/$BACKUP_ROOT"
+        BACKUP_DATE=$(date "+%Y%m%d-%H%M%S")
+        BACKUP_IPATH=$(echo $SERVICE_PATH | tr / .)
+        BACKUP_IPATH=${BACKUP_IPATH:1}
+
+        BACKUP_NAME="${4:-$BACKUP_NAME}"
+        BACKUP_NAME=${BACKUP_NAME:-"%s___%p___%d"}
+        BACKUP_NAME="${BACKUP_NAME/\%s/$SERVICE_NAME}"
+        BACKUP_NAME="${BACKUP_NAME/\%p/$BACKUP_IPATH}"
+        BACKUP_NAME="${BACKUP_NAME/\%d/$BACKUP_DATE}.tar.gz"
 
         # make a nice backup structure
         SERVICE_PATH_DIRNAME=$(dirname $SERVICE_PATH)
