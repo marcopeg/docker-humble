@@ -6,6 +6,6 @@
 
 ```
 mkdir my-project && cd my-project
-docker run --rm -v $PWD:/cwd marcopeg/docker-utils /bin/ash scaffold.sh app
+docker run --rm -v $PWD:/cwd marcopeg/humble /bin/ash scaffold.sh app
 ./compose up
 ```
