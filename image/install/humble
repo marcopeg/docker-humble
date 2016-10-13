@@ -41,8 +41,13 @@ ENV_IS_VALID=false
 [ -f $ENV_CONFIG ] && ENV_IS_VALID=true
 [ -f $ENV_OVERRIDE ] && ENV_IS_VALID=true
 if [ $ENV_IS_VALID == false ]; then
-    echo "Please create a \".env\" file to describe your environment"
-    exit 1
+    echo ">>"
+    echo ">> \"$ENV_CONFIG\" not found, switch to default values"
+    echo ">> (you may experience some troubles...)"
+    echo ">>"
+    sleep 2
+    HUMBLE_ENV=development
+    HUMBLE_PORT=8080
 fi
 
 # Command is mandatory
