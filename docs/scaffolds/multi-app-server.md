@@ -5,6 +5,6 @@
 ## Multi App Server
 
 ```
-docker run --rm -v $PWD:/cwd marcopeg/docker-utils /bin/ash scaffold.sh server
+docker run --rm -v $PWD:/cwd marcopeg/humble /bin/ash scaffold.sh server
 ./compose-server up
 ```
