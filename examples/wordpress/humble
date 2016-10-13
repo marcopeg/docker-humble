@@ -36,6 +36,10 @@
 ENV_CONFIG=.env
 ENV_OVERRIDE=.env.override
 
+# Default environment values
+HUMBLE_ENV=development
+HUMBLE_PORT=8080
+
 # Validate environment
 ENV_IS_VALID=false
 [ -f $ENV_CONFIG ] && ENV_IS_VALID=true
@@ -46,8 +50,6 @@ if [ $ENV_IS_VALID == false ]; then
     echo ">> (you may experience some troubles...)"
     echo ">>"
     sleep 2
-    HUMBLE_ENV=development
-    HUMBLE_PORT=8080
 fi
 
 # Command is mandatory
