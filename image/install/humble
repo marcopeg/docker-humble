@@ -122,9 +122,8 @@ if [[ "info" == $PROJECT_CMD ]]; then
 fi
 
 
-
 function getContainerId {
-    echo $($WHICH_DOCKER ps -q $1)
+	eval $WHICH_DOCKER ps -q $1
 }
 
 function getContainerRunCmd {
@@ -178,7 +177,8 @@ if [[ "utils" == $PROJECT_CMD ]]; then
         SERVICE_PATH_DIRNAME=$(dirname $SERVICE_PATH)
         SERVICE_PATH_BASENAME=$(basename $SERVICE_PATH)
 
-        eval "mkdir -p $BACKUP_TARGET && docker run --rm --volumes-from=$SERVICE_CID -v=$BACKUP_TARGET:/host-working-folder marcopeg/humble tar cvzf /host-working-folder/$BACKUP_NAME -C $SERVICE_PATH_DIRNAME ${SERVICE_PATH_BASENAME:-.}"
+        CMD="mkdir -p $BACKUP_TARGET && docker run --rm --volumes-from=$SERVICE_CID -v=$BACKUP_TARGET:/host-working-folder marcopeg/humble tar cvzf /host-working-folder/$BACKUP_NAME -C $SERVICE_PATH_DIRNAME ${SERVICE_PATH_BASENAME:-.}"
+        eval $CMD
         exit
     fi
 
@@ -194,7 +194,7 @@ if [[ "utils" == $PROJECT_CMD ]]; then
 
         # interpolate service string from backup file name
         SERVICE_STRING=$4
-        if [[ "" == $SERVICE_STRING ]]; then
+        if [[ "" == "$SERVICE_STRING" ]]; then
             SERVICE_STRING=$BACKUP_FILE
             SERVICE_STRING="`echo $SERVICE_STRING | grep '___' | sed -e's,^\(.*___\).*,\1,g'`"
             SERVICE_STRING="${SERVICE_STRING%???}"
@@ -207,7 +207,8 @@ if [[ "utils" == $PROJECT_CMD ]]; then
         SERVICE_PATH=$(urlGetPath $SERVICE_STRING)
         SERVICE_CID=$(getContainerId $SERVICE_NAME)
 
-        eval "docker run --rm --volumes-from=$SERVICE_CID -v=$BACKUP_PATH:/host-backup-source marcopeg/humble sh -c \"mkdir -p $(dirname $SERVICE_PATH) && cd $(dirname $SERVICE_PATH) && tar xvfz /host-backup-source\""
+        CMD="docker run --rm --volumes-from=$SERVICE_CID -v=$BACKUP_PATH:/host-backup-source marcopeg/humble sh -c \"mkdir -p $(dirname $SERVICE_PATH) && cd $(dirname $SERVICE_PATH) && tar xvfz /host-backup-source\""
+        eval $CMD
         exit
     fi
 
@@ -217,7 +218,8 @@ if [[ "utils" == $PROJECT_CMD ]]; then
         SOURCE_CID=$(getContainerId $SOURCE_SERVICE)
         TARGET_PATH="$PWD/$4"
 
-        eval "mkdir -p $TARGET_PATH && docker run --rm --volumes-from=$SOURCE_CID -v=$TARGET_PATH:/host-working-folder marcopeg/humble cp -rf $SOURCE_PATH/. /host-working-folder"
+        CMD="mkdir -p $TARGET_PATH && docker run --rm --volumes-from=$SOURCE_CID -v=$TARGET_PATH:/host-working-folder marcopeg/humble cp -rf $SOURCE_PATH/. /host-working-folder"
+        eval $CMD
         exit
     fi
 
@@ -226,7 +228,8 @@ if [[ "utils" == $PROJECT_CMD ]]; then
         TARGET_PATH=$(urlGetPath $4)
         TARGET_CID=$(getContainerId $TARGET_SERVICE)
 
-        eval "docker run --rm --volumes-from=$TARGET_CID -v="$PWD/$3":/host-working-folder marcopeg/humble cp -rf /host-working-folder/. $TARGET_PATH"
+        CMD="docker run --rm --volumes-from=$TARGET_CID -v="$PWD/$3":/host-working-folder marcopeg/humble cp -rf /host-working-folder/. $TARGET_PATH"
+        eval $CMD
         exit
     fi
 

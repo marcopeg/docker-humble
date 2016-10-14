@@ -2,7 +2,9 @@
 
 hash () {
     [[ $(which md5) ]] && HASH_CMD=md5 || HASH_CMD=md5sum
-    echo $1 | $HASH_CMD
+    VAL=$(echo $1 | $HASH_CMD)
+    VAL=${VAL%???}
+    echo $VAL
 }
 
 function parse_yaml {
@@ -36,7 +38,6 @@ SITES_ENABLED_PATH=$CACHE_PATH/sites-enabled
 CONFIG_FILE="$SCRIPT_NAME.yml"
 
 
-
 # Validate Environment Configuration
 # -- to be completed --
 if [ ! -f $CONFIG_FILE ]; then
@@ -65,7 +66,7 @@ fi
 
 # create the cache directory structure
 [ ! -d $CACHE_ROOT ] && mkdir $CACHE_ROOT
-[ ! -d $CACHE_PATH ] &&mkdir $CACHE_PATH
+[ ! -d $CACHE_PATH ] && mkdir $CACHE_PATH
 [ ! -d $SITES_ENABLED_PATH ] && mkdir $SITES_ENABLED_PATH
 
 # Load Server Settings
@@ -183,9 +184,10 @@ if [[ "config" == $PROJECT_CMD ]]; then
         cp -rf $TEMPLATES_ROOT/default-website $CACHE_PATH/
         cp $TEMPLATES_ROOT/docker-compose.yml.tpl $CACHE_PATH/docker-compose.yml
 
+
         # NGiNX Config File
         CONFIG_FILE="$CACHE_PATH/nginx.conf"
-        CONFIG_FILE_TMP=$(mktemp /tmp/proxy-gen.$(hash $CONFIG_FILE).$(date "+%Y%m%d-%H%M%S"))
+        CONFIG_FILE_TMP=$(mktemp "/tmp/proxy-gen.$(hash $CONFIG_FILE).$(date +%Y%m%d-%H%M%S).XXXXXX")
         cp $TEMPLATES_ROOT/nginx.conf.tpl $CONFIG_FILE_TMP
         sed -i -e "s/\$SERVER_PORT/$proxy__port/g" $CONFIG_FILE_TMP
         cat $CONFIG_FILE_TMP > $CONFIG_FILE
@@ -197,7 +199,7 @@ if [[ "config" == $PROJECT_CMD ]]; then
             APP_NAME=$(basename "$d")
             eval APP_SKIP=\$"apps__${APP_NAME}__skip"
             CONFIG_FILE="$SITES_ENABLED_PATH/$(hash $d).conf"
-            CONFIG_FILE_TMP=$(mktemp /tmp/proxy-gen.$CACHE_NAME.$(hash $d).$(date "+%Y%m%d-%H%M%S"))
+            CONFIG_FILE_TMP=$(mktemp "/tmp/proxy-gen.$CACHE_NAME.$(hash $d).$(date +%Y%m%d-%H%M%S).XXXXXX")
 
             cp $TEMPLATES_ROOT/virtual-host.conf.tpl $CONFIG_FILE_TMP
             sed -i -e "s/\$SERVER_IP/$proxy__ip/g" $CONFIG_FILE_TMP
