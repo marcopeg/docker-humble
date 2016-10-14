@@ -61,10 +61,14 @@ We believe in time efficiency so whenever you need to start a new project, we ai
 ### Compose Utility Scripts
 
 - [How to use `docker-humble` in a Compose project](./docs/how-to-use-humble-in-a-docker-compose-project.md)
-- [mysql-seed](./docs/scripts/mysql-seed.md)
-- [mysql-dump](./docs/scripts/mysql-dump.md)
-- [fs-seed](./docs/scripts/fs-seed.md)
-- [fs-dump](./docs/scripts/fs-dump.md)
-- [fs-import](./docs/scripts/fs-import.md)
-- [fs-export](./docs/scripts/fs-export.md)
-- [wp-migrate](./docs/scripts/wp-migrate.md)
+- File System
+  - [fs-seed](./docs/scripts/fs-seed.md)
+  - [fs-dump](./docs/scripts/fs-dump.md)
+  - [fs-import](./docs/scripts/fs-import.md)
+  - [fs-export](./docs/scripts/fs-export.md)
+- MySQL
+  - [mysql-seed](./docs/scripts/mysql-seed.md)
+  - [mysql-dump](./docs/scripts/mysql-dump.md)
+  - [mysql-create-db](./docs/scripts/mysql-create-db.md)
+- Others
+  - [wp-migrate](./docs/scripts/wp-migrate.md)
