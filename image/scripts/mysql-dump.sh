@@ -1,6 +1,11 @@
+#
+# mysql-dump
+#
+
 
 BACKUP_ROOT=${BACKUP_ROOT:-"data/backup"}
 BACKUP_DATE_FORMAT=${BACKUP_DATE_FORMAT:-"+%Y%m%d.%H%M%S"}
+BACKUP_DATE=$(date $BACKUP_DATE_FORMAT)
 
 MYSQL_HOST=${MYSQL_HOST:-mysql}
 MYSQL_USER=${MYSQL_USER:-root}
@@ -10,7 +15,6 @@ MYSQL_DB=${MYSQL_DB:-wordpress}
 MYSQL_DUMP_GZIP=${MYSQL_DUMP_GZIP:-"yes"}
 MYSQL_DUMP_FORMAT="%s___%p___%d"
 
-BACKUP_DATE=$(date $BACKUP_DATE_FORMAT)
 
 # Handle custom host
 CUSTOM_HOST="`echo $MYSQL_DB | grep '://' | sed -e's,^\(.*://\).*,\1,g'`"
