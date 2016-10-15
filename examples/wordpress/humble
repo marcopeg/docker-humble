@@ -156,16 +156,18 @@ function urlGetPath {
 # Define some general variables
 #
 
-BACKUP_ROOT=${FS_SEED_ROOT:-data/backup}
+BACKUP_ROOT=${BACKUP_ROOT:-"data/backup"}
 BACKUP_DATE_FORMAT=${BACKUP_DATE_FORMAT:-"+%Y%m%d.%H%M%S"}
 
 BACKUP_DATE=$(date $BACKUP_DATE_FORMAT)
 
 # Interface to `docker-utils` image
-if [[ "utils" == $PROJECT_CMD ]]; then
+if [[ "utils" == "$PROJECT_CMD" ]]; then
     UTILS_CMD=$2
 
-    if [[ "fs-dump" == $UTILS_CMD ]]; then
+    if [[ "fs-dump" == "$UTILS_CMD" ]]; then
+
+        BACKUP_FS_DUMP_FORMAT=${BACKUP_FS_DUMP_FORMAT:-"%s___%p___%d"}
 
         # interpolate target service
         SERVICE_NAME=$(urlGetService $3)
@@ -174,30 +176,51 @@ if [[ "utils" == $PROJECT_CMD ]]; then
 
         # compute backup file name
         BACKUP_TARGET="$PWD/$BACKUP_ROOT"
-        BACKUP_IPATH=$(echo $SERVICE_PATH | tr / .)
-        BACKUP_IPATH=${BACKUP_IPATH:1}
+        BACKUP_INTERNAL_PATH=$(echo $SERVICE_PATH | tr / .)
+        BACKUP_INTERNAL_PATH=${BACKUP_INTERNAL_PATH:1}
 
         BACKUP_NAME="${4:-$BACKUP_NAME}"
-        BACKUP_NAME=${BACKUP_NAME:-"%s___%p___%d"}
+        BACKUP_NAME=${BACKUP_NAME:-$BACKUP_FS_DUMP_FORMAT}
         BACKUP_NAME="${BACKUP_NAME/\%s/$SERVICE_NAME}"
-        BACKUP_NAME="${BACKUP_NAME/\%p/$BACKUP_IPATH}"
+        BACKUP_NAME="${BACKUP_NAME/\%p/$BACKUP_INTERNAL_PATH}"
         BACKUP_NAME="${BACKUP_NAME/\%d/$BACKUP_DATE}.tar.gz"
 
         # make a nice backup structure
         SERVICE_PATH_DIRNAME=$(dirname $SERVICE_PATH)
         SERVICE_PATH_BASENAME=$(basename $SERVICE_PATH)
 
+        echo ""
+        echo "====== UTILS - FS-DUMP ======"
+        echo "service:  $SERVICE_NAME"
+        echo "path:     $SERVICE_PATH"
+        echo "target:   $BACKUP_ROOT/$BACKUP_NAME"
+        echo "(sleep 3s, you can abort now)"
+        sleep 3
+        echo ""
+        echo ""
+
+        echo "--> start..."
         CMD="mkdir -p $BACKUP_TARGET && docker run --rm --volumes-from=$SERVICE_CID -v=$BACKUP_TARGET:/host-working-folder marcopeg/humble tar cvzf /host-working-folder/$BACKUP_NAME -C $SERVICE_PATH_DIRNAME ${SERVICE_PATH_BASENAME:-.}"
         eval $CMD
+
+        echo ""
+        echo "--> fs-dump complete!"
+        echo ""
+        echo ""
         exit
     fi
 
     if [[ "fs-seed" == $UTILS_CMD ]]; then
-        BACKUP_FILE=${3:-$BACKUP_FILE}
+        BACKUP_FILE=${3}
         BACKUP_PATH="$PWD/$BACKUP_ROOT/$BACKUP_FILE"
 
         if [[ ! -f $BACKUP_PATH ]]; then
+            echo ""
+            echo "====== UTILS - FS-SEED ======"
             echo "ERROR: Backup file does not exists!"
+            echo "($BACKUP_PATH)"
+            echo ""
+            echo ""
             exit
         fi
 
@@ -216,29 +239,90 @@ if [[ "utils" == $PROJECT_CMD ]]; then
         SERVICE_PATH=$(urlGetPath $SERVICE_STRING)
         SERVICE_CID=$(getContainerId $SERVICE_NAME)
 
+        echo ""
+        echo "====== UTILS - FS-SEED ======"
+        echo "source:   $BACKUP_ROOT/$BACKUP_FILE"
+        echo "service:  $SERVICE_NAME"
+        echo "path:     $SERVICE_PATH"
+        echo "(sleep 3s, you can abort now)"
+        sleep 3
+        echo ""
+        echo ""
+
+        echo "--> start..."
         CMD="docker run --rm --volumes-from=$SERVICE_CID -v=$BACKUP_PATH:/host-backup-source marcopeg/humble sh -c \"mkdir -p $(dirname $SERVICE_PATH) && cd $(dirname $SERVICE_PATH) && tar xvfz /host-backup-source\""
         eval $CMD
+
+        echo ""
+        echo "--> fs-seed complete!"
+        echo ""
+        echo ""
         exit
     fi
 
-    if [[ "fs-export" == $UTILS_CMD ]]; then
-        SOURCE_SERVICE=$(urlGetService $3)
-        SOURCE_PATH=$(urlGetPath $3)
-        SOURCE_CID=$(getContainerId $SOURCE_SERVICE)
-        TARGET_PATH="$PWD/$4"
+    if [[ "fs-export" == "$UTILS_CMD" ]]; then
+        SERVICE_NAME=$(urlGetService $3)
+        SERVICE_PATH=$(urlGetPath $3)
+        SOURCE_CID=$(getContainerId $SERVICE_NAME)
+        TARGET_FOLDER=${4:-$(basename $SERVICE_PATH)}
+        TARGET_PATH="$PWD/$TARGET_FOLDER"
 
-        CMD="mkdir -p $TARGET_PATH && docker run --rm --volumes-from=$SOURCE_CID -v=$TARGET_PATH:/host-working-folder marcopeg/humble cp -rf $SOURCE_PATH/. /host-working-folder"
+        echo ""
+        echo "====== UTILS - FS-EXPORT ======"
+        if [[ "" == "$3" ]]; then
+            echo "ERROR: origin was not set"
+            echo ""
+            echo ""
+            exit
+        fi
+        echo "service:  $SERVICE_NAME"
+        echo "path:     $SERVICE_PATH"
+        echo "target:   $TARGET_PATH"
+        echo "(sleep 3s, you can abort now)"
+        sleep 3
+        echo ""
+        echo ""
+
+        echo "--> start..."
+        CMD="mkdir -p $TARGET_PATH && docker run --rm --volumes-from=$SOURCE_CID -v=$TARGET_PATH:/host-working-folder marcopeg/humble cp -rf $SERVICE_PATH/. /host-working-folder"
         eval $CMD
+
+        echo "--> fs-export complete!"
+        echo ""
+        echo ""
         exit
     fi
 
-    if [[ "fs-import" == $UTILS_CMD ]]; then
-        TARGET_SERVICE=$(urlGetService $4)
-        TARGET_PATH=$(urlGetPath $4)
-        TARGET_CID=$(getContainerId $TARGET_SERVICE)
+    if [[ "fs-import" == "$UTILS_CMD" ]]; then
+        SERVICE_NAME=$(urlGetService $4)
+        SERVICE_PATH=$(urlGetPath $4)
+        SERVICE_CID=$(getContainerId $SERVICE_NAME)
+        SOURCE_PATH="$PWD/$3"
 
-        CMD="docker run --rm --volumes-from=$TARGET_CID -v="$PWD/$3":/host-working-folder marcopeg/humble cp -rf /host-working-folder/. $TARGET_PATH"
+        echo ""
+        echo "====== UTILS - FS-IMPORT ======"
+        if [ ! -d $SOURCE_PATH ]; then
+            echo "ERROR: source folder does not exists"
+            echo "($SOURCE_PATH)"
+            echo ""
+            echo ""
+            exit
+        fi
+        echo "from:     $SOURCE_PATH"
+        echo "service:  $SERVICE_NAME"
+        echo "path:     $SERVICE_PATH"
+        echo "(sleep 3s, you can abort now)"
+        sleep 3
+        echo ""
+        echo ""
+
+        echo "--> start..."
+        CMD="docker run --rm --volumes-from=$SERVICE_CID -v=$SOURCE_PATH:/host-working-folder marcopeg/humble cp -rf /host-working-folder/. $SERVICE_PATH"
         eval $CMD
+
+        echo "--> fs-import complete!"
+        echo ""
+        echo ""
         exit
     fi
 
@@ -247,11 +331,6 @@ if [[ "utils" == $PROJECT_CMD ]]; then
     EXEC_MODE=$(getContainerRunCmd $(getContainerId humble))
     TARGET_SCRIPT="${2-seed}.sh ${@:3}"
     WHICH_CMD="$WHICH_CMD $EXEC_MODE humble /bin/ash /scripts/$TARGET_SCRIPT"
-
-    echo ""
-    echo ">>> Docker Utils :: $TARGET_SCRIPT"
-    echo ""
-    echo ""
 fi
 
 # Run a project specific script

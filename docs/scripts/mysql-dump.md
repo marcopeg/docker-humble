@@ -22,11 +22,14 @@ Dump data from `typo3` database in `db2` service to `/data/mysql-dump/db2.typo3.
 ## Environment Variables
 
 ```
-MYSQL_HOST              # default: mysql
-MYSQL_USER              # default: root
-MYSQL_PASSWORD          # default: root
-MYSQL_DB                # $1, default: wordpress
-MYSQL_DUMP_ROOT         # default: /data/backup
-MYSQL_DUMP_GZIP         # yes/no, default: yes
-MYSQL_DUMP_DATE_FORMAT  # default: +%Y%m%d-%H%M%S
+BACKUP_ROOT             # default: "data/backup"
+BACKUP_DATE_FORMAT      # default: "+%Y%m%d.%H%M%S"
+
+MYSQL_HOST              # default: "mysql"
+MYSQL_USER              # default: "root"
+MYSQL_PASSWORD          # default: "root"
+MYSQL_DB                # $1, default: "wordpress"
+
+MYSQL_DUMP_FORMAT       # default: "%s___%p___%d"
+MYSQL_DUMP_GZIP         # yes/no, default: "yes"
 ```

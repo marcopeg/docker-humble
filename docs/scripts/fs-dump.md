@@ -21,5 +21,8 @@ Will create:
 ## Environment Variables
 
 ```
-FS_SEED_ROOT             # default: data/backup
+BACKUP_ROOT             # default: "data/backup"
+BACKUP_DATE_FORMAT      # default: "+%Y%m%d.%H%M%S"
+
+BACKUP_FS_DUMP_FORMAT   # default: "%s___%p___%d"
 ```

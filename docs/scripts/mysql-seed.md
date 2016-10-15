@@ -6,27 +6,27 @@
 
 ## mysql-seed
 
-Seed `/data/dump/mysql-dump.sql` into the database `db_name` of the service named `mysql`:
+Seed `/data/backup/mysql-dump.sql` into the database `db_name` of the service named `mysql`:
 
 ```
-./humble utils mysql-seed my-dump.sql db_name
+./humble utils mysql-seed my-dump.sql dbName
 ```
 
-Seed `/data/dump/mysql-dump.sql` into the database `db_name` of the service named `db_host`:
+Seed `/data/backup/mysql-dump.sql` into the database `db_name` of the service named `db_host`:
 
 ```
-./humble utils mysql-seed my-dump.sql db_host://db_name
+./humble utils mysql-seed my-dump.sql service://dbName
 ```
 
 ## Environment Variables
 
 ```
-MYSQL_HOST              # default: mysql
-MYSQL_USER              # default: root
-MYSQL_PASSWORD          # default: root
-MYSQL_DB                # $1, default: wordpress
-MYSQL_SEED_ROOT         # default: $MYSQL_DUMP_ROOT, default: /data/backup
-MYSQL_SEED_DB           # database to seed, default: $MYSQL_DB
+BACKUP_ROOT             # default: "data/backup"
+
+MYSQL_HOST              # default: "mysql""
+MYSQL_USER              # default: "root"
+MYSQL_PASSWORD          # default: "root"
+MYSQL_DB                # default: "wordpress"
 ```
 
 ## File Name Conventions
@@ -35,10 +35,10 @@ The seed source file name is the first argument (and it is optional).
 
 ```
 Filename:
-mysql___wordpress.20161010-153008.sql.gz
+mysql___wordpress___20161010-153008.sql.gz
 
 Parses as:
-{serviceName}___{dbName}.20161010-153008.sql{.compression}
+{serviceName}___{dbName}___20161010-153008.sql{.compression}
 ```
 
 > This is also the default format used by `mysql-dump` so you can use just an 
@@ -56,5 +56,7 @@ Reads as:
 {serviceName}://{dbName}
 ```
 
-The `{serviceName}` portion is optional and will be defaulted to `$MYSQL_DB` environment variable.
+The `{serviceName}` portion is optional and will be defaulted to `$MYSQL_HOST` environment variable.
+
+The `{dbName}` portion is defaulted to `$MYSQL_DB` environment variable.
 

@@ -17,5 +17,5 @@ Will seed `/var/www/html/wp-content/uploads` inside `blog` service:
 ## Environment Variables
 
 ```
-FS_SEED_ROOT             # default: data/backup
+BACKUP_ROOT             # default: "data/backup"
 ```
