@@ -67,6 +67,7 @@ else
 fi
 
 mysql -h $MYSQL_HOST -u$MYSQL_USER -p$MYSQL_PASSWORD $MYSQL_DB -e "show tables;"
+
 echo "---> mysql-seed complete!"
 echo ""
 echo ""
