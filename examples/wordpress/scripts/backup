@@ -1,0 +1,30 @@
+#
+# Perform a Versioned Full Backup
+#
+
+BACKUP_TARGET="$HUMBLE_ENV.$BACKUP_DATE"
+
+echo ""
+echo "====== BACKUP ($HUMBLE_ENV) ======"
+echo "to: backup/$BACKUP_TARGET"
+echo "(sleep 3s, you can abort now)"
+sleep 3
+echo ""
+echo ""
+
+mkdir -p "$BACKUP_ROOT/$BACKUP_TARGET"
+
+echo "wp-uploads..."
+./humble utils fs-dump      storage://var/www/html/wp-content/uploads       $BACKUP_TARGET/wp-uploads       >/dev/null 2>/dev/null
+
+echo "wp-plugins..."
+./humble utils fs-dump      storage://var/www/html/wp-content/plugins       $BACKUP_TARGET/wp-plugins       >/dev/null 2>/dev/null
+
+echo "mysql-db..."
+./humble utils mysql-dump   mysql://wordpress                               $BACKUP_TARGET/mysql-db         >/dev/null 2>/dev/null
+
+echo ""
+echo "--> backup complete!"
+echo ""
+echo ""
+exit

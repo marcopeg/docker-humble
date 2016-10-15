@@ -1,0 +1,28 @@
+#
+# Environment Seeding
+#
+
+SEED_SOURCE=${3:-$SEED_SOURCE}
+if [ "" == "$SEED_SOURCE" ]; then
+    SEED_SOURCE="seed-$HUMBLE_ENV"
+fi
+
+echo ""
+echo "====== SEED ($HUMBLE_ENV) ======"
+echo "from: backup/$SEED_SOURCE"
+echo "(sleep 3s, you can abort now)"
+sleep 3
+echo ""
+echo ""
+
+echo "restore local backup..."
+./humble run restore $SEED_SOURCE >/dev/null 2>/dev/null
+
+echo "migrate database..."
+./humble run wp-migrate >/dev/null 2>/dev/null
+
+echo ""
+echo "--> seeding complete!"
+echo ""
+echo ""
+exit
