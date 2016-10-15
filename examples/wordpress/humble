@@ -158,7 +158,6 @@ function urlGetPath {
 
 BACKUP_ROOT=${BACKUP_ROOT:-"data/backup"}
 BACKUP_DATE_FORMAT=${BACKUP_DATE_FORMAT:-"+%Y%m%d.%H%M%S"}
-BACKUP_FS_DUMP_FORMAT=${BACKUP_FS_DUMP_FORMAT:-"%s___%p___%d"}
 
 BACKUP_DATE=$(date $BACKUP_DATE_FORMAT)
 
@@ -167,6 +166,8 @@ if [[ "utils" == "$PROJECT_CMD" ]]; then
     UTILS_CMD=$2
 
     if [[ "fs-dump" == "$UTILS_CMD" ]]; then
+
+        BACKUP_FS_DUMP_FORMAT=${BACKUP_FS_DUMP_FORMAT:-"%s___%p___%d"}
 
         # interpolate target service
         SERVICE_NAME=$(urlGetService $3)
@@ -209,13 +210,14 @@ if [[ "utils" == "$PROJECT_CMD" ]]; then
     fi
 
     if [[ "fs-seed" == $UTILS_CMD ]]; then
-        BACKUP_FILE=${3:-$BACKUP_FILE}
+        BACKUP_FILE=${3}
         BACKUP_PATH="$PWD/$BACKUP_ROOT/$BACKUP_FILE"
 
         if [[ ! -f $BACKUP_PATH ]]; then
             echo ""
             echo "====== UTILS - FS-SEED ======"
             echo "ERROR: Backup file does not exists!"
+            echo "($BACKUP_PATH)"
             echo ""
             echo ""
             exit
