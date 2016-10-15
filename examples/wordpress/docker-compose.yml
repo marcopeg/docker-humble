@@ -28,6 +28,8 @@ services:
         build: ../../image
         volumes_from:
             - storage
+        env_file:
+            - .env
         volumes:
             - ./data:/data
             - ../../image/scripts:/scripts

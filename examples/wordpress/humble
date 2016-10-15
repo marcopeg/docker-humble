@@ -156,9 +156,9 @@ function urlGetPath {
 # Define some general variables
 #
 
-BACKUP_ROOT=${FS_SEED_ROOT:-data/backup}
+BACKUP_ROOT=${BACKUP_ROOT:-"data/backup"}
 BACKUP_DATE_FORMAT=${BACKUP_DATE_FORMAT:-"+%Y%m%d.%H%M%S"}
-BACKUP_FS_SEED_FORMAT=${BACKUP_FS_SEED_FORMAT:-"%s___%p___%d"}
+BACKUP_FS_DUMP_FORMAT=${BACKUP_FS_DUMP_FORMAT:-"%s___%p___%d"}
 
 BACKUP_DATE=$(date $BACKUP_DATE_FORMAT)
 
@@ -179,7 +179,7 @@ if [[ "utils" == "$PROJECT_CMD" ]]; then
         BACKUP_INTERNAL_PATH=${BACKUP_INTERNAL_PATH:1}
 
         BACKUP_NAME="${4:-$BACKUP_NAME}"
-        BACKUP_NAME=${BACKUP_NAME:-$BACKUP_FS_SEED_FORMAT}
+        BACKUP_NAME=${BACKUP_NAME:-$BACKUP_FS_DUMP_FORMAT}
         BACKUP_NAME="${BACKUP_NAME/\%s/$SERVICE_NAME}"
         BACKUP_NAME="${BACKUP_NAME/\%p/$BACKUP_INTERNAL_PATH}"
         BACKUP_NAME="${BACKUP_NAME/\%d/$BACKUP_DATE}.tar.gz"
@@ -282,11 +282,6 @@ if [[ "utils" == "$PROJECT_CMD" ]]; then
     EXEC_MODE=$(getContainerRunCmd $(getContainerId humble))
     TARGET_SCRIPT="${2-seed}.sh ${@:3}"
     WHICH_CMD="$WHICH_CMD $EXEC_MODE humble /bin/ash /scripts/$TARGET_SCRIPT"
-
-    echo ""
-    echo ">>> Docker Utils :: $TARGET_SCRIPT"
-    echo ""
-    echo ""
 fi
 
 # Run a project specific script
