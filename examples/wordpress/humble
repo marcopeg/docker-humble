@@ -158,14 +158,15 @@ function urlGetPath {
 
 BACKUP_ROOT=${FS_SEED_ROOT:-data/backup}
 BACKUP_DATE_FORMAT=${BACKUP_DATE_FORMAT:-"+%Y%m%d.%H%M%S"}
+BACKUP_FS_SEED_FORMAT=${BACKUP_FS_SEED_FORMAT:-"%s___%p___%d"}
 
 BACKUP_DATE=$(date $BACKUP_DATE_FORMAT)
 
 # Interface to `docker-utils` image
-if [[ "utils" == $PROJECT_CMD ]]; then
+if [[ "utils" == "$PROJECT_CMD" ]]; then
     UTILS_CMD=$2
 
-    if [[ "fs-dump" == $UTILS_CMD ]]; then
+    if [[ "fs-dump" == "$UTILS_CMD" ]]; then
 
         # interpolate target service
         SERVICE_NAME=$(urlGetService $3)
@@ -174,21 +175,36 @@ if [[ "utils" == $PROJECT_CMD ]]; then
 
         # compute backup file name
         BACKUP_TARGET="$PWD/$BACKUP_ROOT"
-        BACKUP_IPATH=$(echo $SERVICE_PATH | tr / .)
-        BACKUP_IPATH=${BACKUP_IPATH:1}
+        BACKUP_INTERNAL_PATH=$(echo $SERVICE_PATH | tr / .)
+        BACKUP_INTERNAL_PATH=${BACKUP_INTERNAL_PATH:1}
 
         BACKUP_NAME="${4:-$BACKUP_NAME}"
-        BACKUP_NAME=${BACKUP_NAME:-"%s___%p___%d"}
+        BACKUP_NAME=${BACKUP_NAME:-$BACKUP_FS_SEED_FORMAT}
         BACKUP_NAME="${BACKUP_NAME/\%s/$SERVICE_NAME}"
-        BACKUP_NAME="${BACKUP_NAME/\%p/$BACKUP_IPATH}"
+        BACKUP_NAME="${BACKUP_NAME/\%p/$BACKUP_INTERNAL_PATH}"
         BACKUP_NAME="${BACKUP_NAME/\%d/$BACKUP_DATE}.tar.gz"
 
         # make a nice backup structure
         SERVICE_PATH_DIRNAME=$(dirname $SERVICE_PATH)
         SERVICE_PATH_BASENAME=$(basename $SERVICE_PATH)
 
+        echo ""
+        echo "====== UTILS - FS-DUMP ======"
+        echo "service:  $SERVICE_NAME"
+        echo "path:     $SERVICE_PATH"
+        echo "target:   $BACKUP_ROOT/$BACKUP_NAME"
+        echo "(sleep 3s, you can abort now)"
+        sleep 3
+        echo ""
+        echo ""
+
         CMD="mkdir -p $BACKUP_TARGET && docker run --rm --volumes-from=$SERVICE_CID -v=$BACKUP_TARGET:/host-working-folder marcopeg/humble tar cvzf /host-working-folder/$BACKUP_NAME -C $SERVICE_PATH_DIRNAME ${SERVICE_PATH_BASENAME:-.}"
         eval $CMD
+
+        echo ""
+        echo "--> fs-dump complete!"
+        echo ""
+        echo ""
         exit
     fi
 
