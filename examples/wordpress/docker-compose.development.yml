@@ -1,6 +1,15 @@
 version: '2'
 services:
 
+    storage:
+        volumes:
+            - ./data/dev-mysql-data:/var/lib/mysql
+            - ./data/dev-wp-content:/var/www/html/wp-content
+
+    wordpress:
+        ports:
+            - 8080:80
+            
     pma:
         image: phpmyadmin/phpmyadmin
         links:

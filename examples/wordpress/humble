@@ -34,6 +34,7 @@
 # app to describe herself in the $ENV_CONFIG but some other changes
 # can be injected from external services like the DockerProxy project.
 ENV_CONFIG=.env
+ENV_LOCAL=.env.local
 ENV_OVERRIDE=.env.override
 
 # Default environment values
@@ -72,6 +73,7 @@ fi
 
 # Get info about the current environment
 [ -f $ENV_CONFIG ] && source $ENV_CONFIG
+[ -f $ENV_LOCAL ] && source $ENV_LOCAL
 [ -f $ENV_OVERRIDE ] && source $ENV_OVERRIDE
 
 # Load the optional override file
@@ -149,12 +151,21 @@ function urlGetPath {
     fi
 }
 
+
+#
+# Define some general variables
+#
+
+BACKUP_ROOT=${FS_SEED_ROOT:-data/backup}
+BACKUP_DATE_FORMAT=${BACKUP_DATE_FORMAT:-"+%Y%m%d.%H%M%S"}
+
+BACKUP_DATE=$(date $BACKUP_DATE_FORMAT)
+
 # Interface to `docker-utils` image
 if [[ "utils" == $PROJECT_CMD ]]; then
     UTILS_CMD=$2
 
     if [[ "fs-dump" == $UTILS_CMD ]]; then
-        BACKUP_ROOT=${FS_SEED_ROOT:-data/backup}
 
         # interpolate target service
         SERVICE_NAME=$(urlGetService $3)
@@ -163,7 +174,6 @@ if [[ "utils" == $PROJECT_CMD ]]; then
 
         # compute backup file name
         BACKUP_TARGET="$PWD/$BACKUP_ROOT"
-        BACKUP_DATE=$(date "+%Y%m%d-%H%M%S")
         BACKUP_IPATH=$(echo $SERVICE_PATH | tr / .)
         BACKUP_IPATH=${BACKUP_IPATH:1}
 
@@ -183,7 +193,6 @@ if [[ "utils" == $PROJECT_CMD ]]; then
     fi
 
     if [[ "fs-seed" == $UTILS_CMD ]]; then
-        BACKUP_ROOT=${FS_SEED_ROOT:-data/backup}
         BACKUP_FILE=${3:-$BACKUP_FILE}
         BACKUP_PATH="$PWD/$BACKUP_ROOT/$BACKUP_FILE"
 
@@ -243,6 +252,19 @@ if [[ "utils" == $PROJECT_CMD ]]; then
     echo ">>> Docker Utils :: $TARGET_SCRIPT"
     echo ""
     echo ""
+fi
+
+# Run a project specific script
+if [[ "run" == $PROJECT_CMD ]]; then
+    if [[ "" != "$2" ]]; then
+        SCRIPT_NAME=$2
+        SCRIPT_PATH="./scripts/$SCRIPT_NAME"
+        if [ -f $SCRIPT_PATH ]; then
+            ARGS=${@:3}
+            source $SCRIPT_PATH
+            exit
+        fi
+    fi
 fi
 
 # Wrap docker-compose commands
