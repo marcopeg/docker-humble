@@ -26,3 +26,7 @@ BACKUP_DATE_FORMAT      # default: "+%Y%m%d.%H%M%S"
 
 BACKUP_FS_DUMP_FORMAT   # default: "%s___%p___%d"
 ```
+
+## Skip Feedback
+
+If you want to skip visual feedback append `--now` as last parameter.

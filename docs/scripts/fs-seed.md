@@ -19,3 +19,7 @@ Will seed `/var/www/html/wp-content/uploads` inside `blog` service:
 ```
 BACKUP_ROOT             # default: "data/backup"
 ```
+
+## Skip Feedback
+
+If you want to skip visual feedback append `--now` as last parameter.
