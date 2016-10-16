@@ -60,3 +60,6 @@ The `{serviceName}` portion is optional and will be defaulted to `$MYSQL_HOST` e
 
 The `{dbName}` portion is defaulted to `$MYSQL_DB` environment variable.
 
+## Skip Feedback
+
+If you want to skip visual feedback append `--now` as last parameter.
