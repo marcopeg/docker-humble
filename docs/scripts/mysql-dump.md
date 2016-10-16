@@ -33,3 +33,7 @@ MYSQL_DB                # $1, default: "wordpress"
 MYSQL_DUMP_FORMAT       # default: "%s___%p___%d"
 MYSQL_DUMP_GZIP         # yes/no, default: "yes"
 ```
+
+## Skip Feedback
+
+If you want to skip visual feedback append `--now` as last parameter.

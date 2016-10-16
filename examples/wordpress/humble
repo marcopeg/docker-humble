@@ -156,10 +156,22 @@ function urlGetPath {
 # Define some general variables
 #
 
+BACKUP_DELAY=${BACKUP_DELAY:-3}
 BACKUP_ROOT=${BACKUP_ROOT:-"data/backup"}
 BACKUP_DATE_FORMAT=${BACKUP_DATE_FORMAT:-"+%Y%m%d.%H%M%S"}
 
 BACKUP_DATE=$(date $BACKUP_DATE_FORMAT)
+
+PRINT_FEEDBACK="yes"
+P3=$3
+P4=$4
+
+for last; do true; done
+if [ "--now" == "$last" ]; then
+    PRINT_FEEDBACK="no"
+    [ "$P3" == "$last" ] && P3=""
+    [ "$P4" == "$last" ] && P4=""
+fi
 
 # Interface to `docker-utils` image
 if [[ "utils" == "$PROJECT_CMD" ]]; then
@@ -170,8 +182,8 @@ if [[ "utils" == "$PROJECT_CMD" ]]; then
         BACKUP_FS_DUMP_FORMAT=${BACKUP_FS_DUMP_FORMAT:-"%s___%p___%d"}
 
         # interpolate target service
-        SERVICE_NAME=$(urlGetService $3)
-        SERVICE_PATH=$(urlGetPath $3)
+        SERVICE_NAME=$(urlGetService $P3)
+        SERVICE_PATH=$(urlGetPath $P3)
         SERVICE_CID=$(getContainerId $SERVICE_NAME)
 
         # compute backup file name
@@ -179,7 +191,7 @@ if [[ "utils" == "$PROJECT_CMD" ]]; then
         BACKUP_INTERNAL_PATH=$(echo $SERVICE_PATH | tr / .)
         BACKUP_INTERNAL_PATH=${BACKUP_INTERNAL_PATH:1}
 
-        BACKUP_NAME="${4:-$BACKUP_NAME}"
+        BACKUP_NAME="${P4:-$BACKUP_NAME}"
         BACKUP_NAME=${BACKUP_NAME:-$BACKUP_FS_DUMP_FORMAT}
         BACKUP_NAME="${BACKUP_NAME/\%s/$SERVICE_NAME}"
         BACKUP_NAME="${BACKUP_NAME/\%p/$BACKUP_INTERNAL_PATH}"
@@ -189,29 +201,34 @@ if [[ "utils" == "$PROJECT_CMD" ]]; then
         SERVICE_PATH_DIRNAME=$(dirname $SERVICE_PATH)
         SERVICE_PATH_BASENAME=$(basename $SERVICE_PATH)
 
-        echo ""
-        echo "====== UTILS - FS-DUMP ======"
-        echo "service:  $SERVICE_NAME"
-        echo "path:     $SERVICE_PATH"
-        echo "target:   $BACKUP_ROOT/$BACKUP_NAME"
-        echo "(sleep 3s, you can abort now)"
-        sleep 3
-        echo ""
-        echo ""
+        if [ "$PRINT_FEEDBACK" == "yes" ]; then
+            echo ""
+            echo "====== UTILS - FS-DUMP ======"
+            echo "service:  $SERVICE_NAME"
+            echo "path:     $SERVICE_PATH"
+            echo "target:   $BACKUP_ROOT/$BACKUP_NAME"
+            echo "(sleep "$BACKUP_DELAY"s, you can abort now)"
+            sleep $BACKUP_DELAY
+            echo ""
+            echo ""
+        fi
 
-        echo "--> start..."
+        [ "$PRINT_FEEDBACK" == "yes" ] && echo "--> start..."
         CMD="mkdir -p $BACKUP_TARGET && docker run --rm --volumes-from=$SERVICE_CID -v=$BACKUP_TARGET:/host-working-folder marcopeg/humble tar cvzf /host-working-folder/$BACKUP_NAME -C $SERVICE_PATH_DIRNAME ${SERVICE_PATH_BASENAME:-.}"
         eval $CMD
 
-        echo ""
-        echo "--> fs-dump complete!"
-        echo ""
-        echo ""
+        if [ "$PRINT_FEEDBACK" == "yes" ]; then
+            echo ""
+            echo "--> fs-dump complete!"
+            echo ""
+            echo ""
+        fi
         exit
     fi
 
     if [[ "fs-seed" == $UTILS_CMD ]]; then
-        BACKUP_FILE=${3}
+
+        BACKUP_FILE=${P3}
         BACKUP_PATH="$PWD/$BACKUP_ROOT/$BACKUP_FILE"
 
         if [[ ! -f $BACKUP_PATH ]]; then
@@ -225,7 +242,7 @@ if [[ "utils" == "$PROJECT_CMD" ]]; then
         fi
 
         # interpolate service string from backup file name
-        SERVICE_STRING=$4
+        SERVICE_STRING=$P4
         if [[ "" == "$SERVICE_STRING" ]]; then
             SERVICE_STRING=$BACKUP_FILE
             SERVICE_STRING="`echo $SERVICE_STRING | grep '___' | sed -e's,^\(.*___\).*,\1,g'`"
@@ -239,24 +256,28 @@ if [[ "utils" == "$PROJECT_CMD" ]]; then
         SERVICE_PATH=$(urlGetPath $SERVICE_STRING)
         SERVICE_CID=$(getContainerId $SERVICE_NAME)
 
-        echo ""
-        echo "====== UTILS - FS-SEED ======"
-        echo "source:   $BACKUP_ROOT/$BACKUP_FILE"
-        echo "service:  $SERVICE_NAME"
-        echo "path:     $SERVICE_PATH"
-        echo "(sleep 3s, you can abort now)"
-        sleep 3
-        echo ""
-        echo ""
+        if [ "$PRINT_FEEDBACK" == "yes" ]; then
+            echo ""
+            echo "====== UTILS - FS-SEED ======"
+            echo "source:   $BACKUP_ROOT/$BACKUP_FILE"
+            echo "service:  $SERVICE_NAME"
+            echo "path:     $SERVICE_PATH"
+            echo "(sleep "$BACKUP_DELAY"s, you can abort now)"
+            sleep $BACKUP_DELAY
+            echo ""
+            echo ""
+        fi
 
-        echo "--> start..."
+        [ "$PRINT_FEEDBACK" == "yes" ] && echo "--> start..."
         CMD="docker run --rm --volumes-from=$SERVICE_CID -v=$BACKUP_PATH:/host-backup-source marcopeg/humble sh -c \"mkdir -p $(dirname $SERVICE_PATH) && cd $(dirname $SERVICE_PATH) && tar xvfz /host-backup-source\""
         eval $CMD
 
-        echo ""
-        echo "--> fs-seed complete!"
-        echo ""
-        echo ""
+        if [ "$PRINT_FEEDBACK" == "yes" ]; then
+            echo ""
+            echo "--> fs-seed complete!"
+            echo ""
+            echo ""
+        fi
         exit
     fi
 

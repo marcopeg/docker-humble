@@ -23,3 +23,7 @@ MYSQL_DB                # default: wordpress
 WP_MIGRATE_FROM         # 
 WP_MIGRATE_TP           # 
 ```
+
+## Skip Feedback
+
+If you want to skip visual feedback append `--now` as last parameter.

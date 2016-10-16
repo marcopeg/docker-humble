@@ -2,34 +2,47 @@
 # Migrate Wordpress Database
 #
 
+PRINT_FEEDBACK="yes"
+for last; do true; done
+if [ "--now" == "$last" ]; then
+    PRINT_FEEDBACK="no"
+fi
+
+BACKUP_DELAY=${BACKUP_DELAY:-3}
+
 if [ "" == "$WP_MIGRATE_TO" ]; then
     WP_MIGRATE_TO="http://localhost:$HUMBLE_PORT"
 fi
 
-echo ""
-echo "====== WP-MIGRATE ($HUMBLE_ENV) ======"
-
 if [ "" == "$WP_MIGRATE_FROM" ]; then
+    echo "====== WP-MIGRATE ($HUMBLE_ENV) ======"
     echo "--> nothing to migrate"
     echo ""
     exit
 fi
 
-echo "from: $WP_MIGRATE_FROM"
-echo "to:   $WP_MIGRATE_TO"
-echo "(sleep 3s, you can abort now)"
-sleep 3
-echo ""
-echo ""
+if [ "$PRINT_FEEDBACK" == "yes" ]; then
+    echo ""
+    echo "====== WP-MIGRATE ($HUMBLE_ENV) ======"
+    echo "from: $WP_MIGRATE_FROM"
+    echo "to:   $WP_MIGRATE_TO"
+    echo "(sleep "$BACKUP_DELAY"s, you can abort now)"
+    sleep $BACKUP_DELAY
+    echo ""
+    echo ""
+fi
 
 if [ "" != "WP_MIGRATE_FROM" ]; then
     for MIGRATE_FROM in $WP_MIGRATE_FROM; do
-        echo "migrate $MIGRATE_FROM -> $WP_MIGRATE_TO ..."
-        ./humble utils wp-migrate $MIGRATE_FROM $WP_MIGRATE_TO >/dev/null 2>/dev/null
+        [ "$PRINT_FEEDBACK" == "yes" ] && echo "migrate $MIGRATE_FROM -> $WP_MIGRATE_TO ..."
+        ./humble utils wp-migrate $MIGRATE_FROM $WP_MIGRATE_TO --now >/dev/null 2>/dev/null
     done
 fi
 
-echo ""
-echo "--> migration complete!"
-echo ""
-echo ""
+if [ "$PRINT_FEEDBACK" == "yes" ]; then
+    echo ""
+    echo "--> migration complete!"
+    echo ""
+    echo ""
+fi
+exit
