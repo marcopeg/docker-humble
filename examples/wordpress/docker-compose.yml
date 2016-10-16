@@ -13,7 +13,7 @@ services:
             - MYSQL_DATABASE=wordpress
 
     wordpress:
-        image: wordpress
+        build: ./services/wordpress
         links:
             - mysql:mysql
         ports:
