@@ -3,5 +3,5 @@ services:
 
     storage:
         volumes:
-            - /var/lib/mysql
-            - /var/www/html/wp-content
+            - ./data/production/mysql-data:/var/lib/mysql
+            - ./data/production/wp-content:/var/www/html/wp-content

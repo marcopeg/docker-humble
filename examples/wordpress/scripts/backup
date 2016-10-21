@@ -30,7 +30,7 @@ echo "wp-plugins..."
 ./humble utils fs-dump      storage://var/www/html/wp-content/plugins       $BACKUP_TARGET/wp-plugins       --now >/dev/null 2>/dev/null
 
 echo "database..."
-./humble utils mysql-dump   mysql://wordpress                               $BACKUP_TARGET/mysql-db         --now >/dev/null 2>/dev/null
+./humble utils mysql-dump   mysql://wordpress                               $BACKUP_TARGET/wp-mysql         --now >/dev/null 2>/dev/null
 
 if [ "$PRINT_FEEDBACK" == "yes" ]; then
     echo ""
