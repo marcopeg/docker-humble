@@ -70,12 +70,7 @@ fi
 
 [ "$PRINT_FEEDBACK" == "yes" ] && echo "---> seeding data..."
 if [[ $MYSQL_SEED_FORMAT == "gz" ]]; then
-    TMP_FILE="$MYSQL_SEED_FILE_PATH.$(date +%s).seed"
-    TMP_FILE_GZ="$TMP_FILE.gz"
-    cp $MYSQL_SEED_FILE_PATH $TMP_FILE_GZ
-    gzip -d -f $TMP_FILE_GZ
-    mysql -h $MYSQL_HOST -u$MYSQL_USER -p$MYSQL_PASSWORD $MYSQL_DB < $TMP_FILE;
-    rm -f $TMP_FILE
+    zcat "$MYSQL_SEED_FILE_PATH" | mysql -h $MYSQL_HOST -u$MYSQL_USER -p$MYSQL_PASSWORD $MYSQL_DB;
 else
     mysql -h $MYSQL_HOST -u$MYSQL_USER -p$MYSQL_PASSWORD $MYSQL_DB < $MYSQL_SEED_FILE_PATH;
 fi
