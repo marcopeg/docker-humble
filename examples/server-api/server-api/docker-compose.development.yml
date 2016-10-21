@@ -1,0 +1,10 @@
+version: '2'
+services:
+    api:
+        image: marcopeg/node:0.1.0
+        volumes:
+            - ./services/api:/usr/src/app
+        entrypoint:
+            - npm
+            - run
+            - dev:start

@@ -1,0 +1,3 @@
+Stopping app1_redis_1 ... 
+Stopping app1_node_1 ... 
+[2A[2KStopping app1_redis_1 ... done[2B[1A[2KStopping app1_node_1 ... done[1B

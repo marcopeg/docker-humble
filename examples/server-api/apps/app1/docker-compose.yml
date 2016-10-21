@@ -1,0 +1,11 @@
+version: '2'
+services:
+    node:
+        image: nginx
+        volumes:
+            - ./index.html:/usr/share/nginx/html/index.html
+        ports:
+            - ${HUMBLE_PORT}:80
+
+    redis:
+        image: redis

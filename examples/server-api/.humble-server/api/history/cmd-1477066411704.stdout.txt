@@ -1,0 +1,18 @@
+
+
+
+=================================================
+=== HUMBLE PROJECT ==============================
+=================================================
+
+HUMBLE_ENV: default
+HUMBLE_PORT: 1080
+HUMBLE_HOST: app1.docker.dev
+
+>> Full docker-compose command:
+
+    HUMBLE_ENV=development HUMBLE_PORT=1080 HUMBLE_HOST=app1.docker.dev docker-compose -f docker-compose.yml info
+
+
+
+

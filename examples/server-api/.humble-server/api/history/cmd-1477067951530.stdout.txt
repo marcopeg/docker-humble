@@ -1,0 +1,212 @@
+[
+    {
+        "Id": "4080717348ab2640fe21089b41225c35b2f62c957b99410c0e57fa131c5e1b32",
+        "Created": "2016-10-21T16:16:16.375683526Z",
+        "Path": "nginx",
+        "Args": [
+            "-g",
+            "daemon off;"
+        ],
+        "State": {
+            "Status": "running",
+            "Running": true,
+            "Paused": false,
+            "Restarting": false,
+            "OOMKilled": false,
+            "Dead": false,
+            "Pid": 21681,
+            "ExitCode": 0,
+            "Error": "",
+            "StartedAt": "2016-10-21T16:33:46.298148789Z",
+            "FinishedAt": "2016-10-21T16:33:32.311119309Z"
+        },
+        "Image": "sha256:a5311a310510e5eaff3cfbb22b65d9ce11ddc15e266833909551334d48491921",
+        "ResolvConfPath": "/var/lib/docker/containers/4080717348ab2640fe21089b41225c35b2f62c957b99410c0e57fa131c5e1b32/resolv.conf",
+        "HostnamePath": "/var/lib/docker/containers/4080717348ab2640fe21089b41225c35b2f62c957b99410c0e57fa131c5e1b32/hostname",
+        "HostsPath": "/var/lib/docker/containers/4080717348ab2640fe21089b41225c35b2f62c957b99410c0e57fa131c5e1b32/hosts",
+        "LogPath": "/var/lib/docker/containers/4080717348ab2640fe21089b41225c35b2f62c957b99410c0e57fa131c5e1b32/4080717348ab2640fe21089b41225c35b2f62c957b99410c0e57fa131c5e1b32-json.log",
+        "Name": "/app1_node_1",
+        "RestartCount": 0,
+        "Driver": "aufs",
+        "MountLabel": "",
+        "ProcessLabel": "",
+        "AppArmorProfile": "",
+        "ExecIDs": null,
+        "HostConfig": {
+            "Binds": [
+                "/Users/marcopeg/dev/marcopeg/docker-humble/examples/server-api/apps/app1/index.html:/usr/share/nginx/html/index.html:rw"
+            ],
+            "ContainerIDFile": "",
+            "LogConfig": {
+                "Type": "json-file",
+                "Config": {}
+            },
+            "NetworkMode": "app1_default",
+            "PortBindings": {
+                "80/tcp": [
+                    {
+                        "HostIp": "",
+                        "HostPort": "1080"
+                    }
+                ]
+            },
+            "RestartPolicy": {
+                "Name": "",
+                "MaximumRetryCount": 0
+            },
+            "AutoRemove": false,
+            "VolumeDriver": "",
+            "VolumesFrom": [],
+            "CapAdd": null,
+            "CapDrop": null,
+            "Dns": null,
+            "DnsOptions": null,
+            "DnsSearch": null,
+            "ExtraHosts": null,
+            "GroupAdd": null,
+            "IpcMode": "",
+            "Cgroup": "",
+            "Links": null,
+            "OomScoreAdj": 0,
+            "PidMode": "",
+            "Privileged": false,
+            "PublishAllPorts": false,
+            "ReadonlyRootfs": false,
+            "SecurityOpt": null,
+            "UTSMode": "",
+            "UsernsMode": "",
+            "ShmSize": 67108864,
+            "Runtime": "runc",
+            "ConsoleSize": [
+                0,
+                0
+            ],
+            "Isolation": "",
+            "CpuShares": 0,
+            "Memory": 0,
+            "CgroupParent": "",
+            "BlkioWeight": 0,
+            "BlkioWeightDevice": null,
+            "BlkioDeviceReadBps": null,
+            "BlkioDeviceWriteBps": null,
+            "BlkioDeviceReadIOps": null,
+            "BlkioDeviceWriteIOps": null,
+            "CpuPeriod": 0,
+            "CpuQuota": 0,
+            "CpusetCpus": "",
+            "CpusetMems": "",
+            "Devices": null,
+            "DiskQuota": 0,
+            "KernelMemory": 0,
+            "MemoryReservation": 0,
+            "MemorySwap": 0,
+            "MemorySwappiness": -1,
+            "OomKillDisable": false,
+            "PidsLimit": 0,
+            "Ulimits": null,
+            "CpuCount": 0,
+            "CpuPercent": 0,
+            "IOMaximumIOps": 0,
+            "IOMaximumBandwidth": 0
+        },
+        "GraphDriver": {
+            "Name": "aufs",
+            "Data": null
+        },
+        "Mounts": [
+            {
+                "Source": "/Users/marcopeg/dev/marcopeg/docker-humble/examples/server-api/apps/app1/index.html",
+                "Destination": "/usr/share/nginx/html/index.html",
+                "Mode": "rw",
+                "RW": true,
+                "Propagation": "rprivate"
+            }
+        ],
+        "Config": {
+            "Hostname": "4080717348ab",
+            "Domainname": "",
+            "User": "",
+            "AttachStdin": false,
+            "AttachStdout": false,
+            "AttachStderr": false,
+            "ExposedPorts": {
+                "443/tcp": {},
+                "80/tcp": {}
+            },
+            "Tty": false,
+            "OpenStdin": false,
+            "StdinOnce": false,
+            "Env": [
+                "no_proxy=*.local, 169.254/16",
+                "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+                "NGINX_VERSION=1.11.5-1~jessie"
+            ],
+            "Cmd": [
+                "nginx",
+                "-g",
+                "daemon off;"
+            ],
+            "Image": "nginx",
+            "Volumes": {
+                "/usr/share/nginx/html/index.html": {}
+            },
+            "WorkingDir": "",
+            "Entrypoint": null,
+            "OnBuild": null,
+            "Labels": {
+                "com.docker.compose.config-hash": "2d5270ee5f2b896d1e9338fa81dc2aea450a75fcb92837c642205a8f2931c1f5",
+                "com.docker.compose.container-number": "1",
+                "com.docker.compose.oneoff": "False",
+                "com.docker.compose.project": "app1",
+                "com.docker.compose.service": "node",
+                "com.docker.compose.version": "1.8.0"
+            }
+        },
+        "NetworkSettings": {
+            "Bridge": "",
+            "SandboxID": "554e5a4a16b810525532575ba8acb4c8334c608f3fb3ff30d67d574c7413b9f2",
+            "HairpinMode": false,
+            "LinkLocalIPv6Address": "",
+            "LinkLocalIPv6PrefixLen": 0,
+            "Ports": {
+                "443/tcp": null,
+                "80/tcp": [
+                    {
+                        "HostIp": "0.0.0.0",
+                        "HostPort": "1080"
+                    }
+                ]
+            },
+            "SandboxKey": "/var/run/docker/netns/554e5a4a16b8",
+            "SecondaryIPAddresses": null,
+            "SecondaryIPv6Addresses": null,
+            "EndpointID": "",
+            "Gateway": "",
+            "GlobalIPv6Address": "",
+            "GlobalIPv6PrefixLen": 0,
+            "IPAddress": "",
+            "IPPrefixLen": 0,
+            "IPv6Gateway": "",
+            "MacAddress": "",
+            "Networks": {
+                "app1_default": {
+                    "IPAMConfig": null,
+                    "Links": null,
+                    "Aliases": [
+                        "node",
+                        "4080717348ab"
+                    ],
+                    "NetworkID": "96f4cd2b5a0d5f233341416136c67da58c0108cb1dbfc1dbfed3d170d3723001",
+                    "EndpointID": "2d53beeda6da8cac87d19b7cbffec73bb3313a749a51e1a0a20c0d9fbd0639a9",
+                    "Gateway": "192.168.160.1",
+                    "IPAddress": "192.168.160.2",
+                    "IPPrefixLen": 20,
+                    "IPv6Gateway": "",
+                    "GlobalIPv6Address": "",
+                    "GlobalIPv6PrefixLen": 0,
+                    "MacAddress": "02:42:c0:a8:a0:02"
+                }
+            }
+        }
+    }
+]

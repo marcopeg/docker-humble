@@ -1,0 +1,10 @@
+version: '2'
+services:
+    api:
+        volumes:
+            - ../:/server-root
+            - ../.humble-server/api:/server-api
+        environment:
+            - NODE_ENV=${NODE_ENV}
+        ports:
+            - ${HUMBLE_PORT}:8080

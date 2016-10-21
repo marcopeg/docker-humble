@@ -1,0 +1,3 @@
+Starting node ... 
+Starting redis ... 
+[1A[2KStarting redis ... done[1B[2A[2KStarting node ... done[2B

@@ -1,0 +1,22 @@
+Boot... apps/app1/
+Boot... apps/app2/
+Boot... apps/app1/
+latest: Pulling from library/redis
+Digest: sha256:38e873a0db859d0aa8ab6bae7bcb03c1bb65d2ad120346a09613084b49185912
+Status: Downloaded newer image for redis:latest
+Boot... apps/app2/
+[1BRemoving network c2e744528ac8dd67b5caa58056cf0_default
+Stopping app1_node_1 ... 
+[1A[2KStopping app1_node_1 ... done[1BRemoving app1_node_1 ... 
+[1A[2KRemoving app1_node_1 ... done[1BRemoving network app1_default
+Stopping app2_node_1 ... 
+[1A[2KStopping app2_node_1 ... done[1BRemoving app2_node_1 ... 
+[1A[2KRemoving app2_node_1 ... done[1BRemoving network app2_default
+Creating network "c2e744528ac8dd67b5caa58056cf0_default" with the default driver
+Creating c2e744528ac8dd67b5caa58056cf0_proxy_1
+Creating network "app1_default" with the default driver
+Pulling redis (redis:latest)...
+Creating app1_node_1
+Creating app1_redis_1
+Creating network "app2_default" with the default driver
+Creating app2_node_1
