@@ -2,10 +2,10 @@ version: '2'
 services:
 
     storage:
-        image: busybox
+        image: busybox:1.25
 
     mysql:
-        image: mysql:latest
+        image: mysql:5.7
         volumes_from:
             - storage
         environment:

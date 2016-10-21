@@ -2,7 +2,7 @@
 # Wordpress for Development
 # by @24HR
 
-FROM wordpress:latest
+FROM wordpress:4.6
 
 # Database default settings
 RUN sed -i "s/define('DB_CHARSET', 'utf8');/\/\/define('DB_CHARSET', 'utf8');/g" /usr/src/wordpress/wp-config-sample.php

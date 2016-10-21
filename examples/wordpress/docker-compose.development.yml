@@ -15,7 +15,7 @@ services:
             - 8080:80
 
     pma:
-        image: phpmyadmin/phpmyadmin
+        image: phpmyadmin/phpmyadmin:4.6.4-1
         links:
             - mysql:db
         ports:
