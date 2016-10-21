@@ -1,2 +1,0 @@
-Restarting app1_node_1 ... 
-[1A[2KRestarting app1_node_1 ... done[1B

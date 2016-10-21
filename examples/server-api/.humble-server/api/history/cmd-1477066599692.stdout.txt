@@ -1,4 +1,0 @@
-    Name                  Command               State               Ports             
--------------------------------------------------------------------------------------
-app1_node_1    nginx -g daemon off;             Up      443/tcp, 0.0.0.0:1080->80/tcp 
-app1_redis_1   docker-entrypoint.sh redis ...   Up      6379/tcp                      
