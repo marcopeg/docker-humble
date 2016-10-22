@@ -1,370 +1,49 @@
 #/bin/bash
 
-hash () {
-    [[ $(which md5) ]] && HASH_CMD=md5 || HASH_CMD=md5sum
-    VAL=$(echo $1 | $HASH_CMD)
-    VAL=${VAL%???}
-    echo $VAL
-}
+#
+# Download and executes a remote GitHub gist
+# it will store a local cache to improve performances
+#
+# run `./compose-server --update` to flush local cache
+#
 
-function parse_yaml {
-   local prefix=$2
-   local s='[[:space:]]*' w='[a-zA-Z0-9_]*' fs=$(echo @|tr @ '\034')
-   sed -ne "s|^\($s\):|\1|" \
-        -e "s|^\($s\)\($w\)$s:$s[\"']\(.*\)[\"']$s\$|\1$fs\2$fs\3|p" \
-        -e "s|^\($s\)\($w\)$s:$s\(.*\)$s\$|\1$fs\2$fs\3|p"  $1 |
-   awk -F$fs '{
-      indent = length($1)/2;
-      vname[indent] = $2;
-      for (i in vname) {if (i > indent) {delete vname[i]}}
-      if (length($3) > 0) {
-         vn=""; for (i=0; i<indent; i++) {vn=(vn)(vname[i])("_")}
-         printf("%s%s%s=\"%s\"\n", "'$prefix'",vn, $2, $3);
-      }
-   }'
-}
+# -- Custom Settings
+GIST_URL="https://raw.githubusercontent.com/marcopeg/docker-humble/master/image/install/humble-server"
 
 
 # -- Script Settings (you shouldn't touch it)
 SCRIPT_ROOT=${SCRIPT_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}
 SCRIPT_NAME=${SCRIPT_NAME:-$(basename "${BASH_SOURCE[0]}")}
-SCRIPT_PATH="$SCRIPT_ROOT/$SCRIPT_NAME"
-CONFIG_ROOT=$SCRIPT_ROOT/.$SCRIPT_NAME
-TEMPLATES_ROOT=$CONFIG_ROOT/templates
-CACHE_ROOT=$CONFIG_ROOT/cache
-CACHE_NAME=$(hash $SCRIPT_PATH)
-CACHE_PATH="$CACHE_ROOT/$CACHE_NAME"
-SITES_ENABLED_PATH=$CACHE_PATH/sites-enabled
-CONFIG_FILE="$SCRIPT_NAME.yml"
+SCRIPT_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$SCRIPT_NAME"
+CACHE_FOLDER=~/.remote-gist
+CACHE_FILE="$CACHE_FOLDER/"$SCRIPT_NAME"__$(echo $PWD | tr / .)"
 
-
-# Validate Environment Configuration
-# -- to be completed --
-if [ ! -f $CONFIG_FILE ]; then
-
-    if [ $(which wget) ] ; then
-        PUBLIC_IP=$(wget -qO- http://wgetip.com/)
-    else
-        PUBLIC_IP=$(curl -s https://4.ifcfg.me/)
-    fi
-
-    echo ""
-    echo "============== WARNING ==============="
-    echo ""
-    echo "  !!! >> $CONFIG_FILE << file is missing !!!"
-    echo ""
-    echo "You need to provide a small configuration to run this proxy :-)"
-    #echo "Please run the following command:"
-    #echo ""
-    #echo "    printf 'proxy:P=$PUBLIC_IP\nSERVER_PORT=80' > $ENV_FILE"
-    #echo ""
-    echo "======================================"
-    echo ""
-    exit 1
+if [ ! -d $CACHE_FOLDER ]; then
+    mkdir $CACHE_FOLDER
 fi
 
-
-# create the cache directory structure
-[ ! -d $CACHE_ROOT ] && mkdir $CACHE_ROOT
-[ ! -d $CACHE_PATH ] && mkdir $CACHE_PATH
-[ ! -d $SITES_ENABLED_PATH ] && mkdir $SITES_ENABLED_PATH
-
-# Load Server Settings
-if [ -f $CONFIG_FILE ]; then
-    #parse_yaml $CONFIG_FILE && exit
-    eval $(parse_yaml $CONFIG_FILE)
-fi
-
-[[ ! -z $PROXY_IP ]] && proxy__ip=$PROXY_IP
-[[ ! -z $PROXY_PORT ]] && proxy__port=$PROXY_PORT
-
-if [[ $proxy__ip == "0.0.0.0" ]]; then
-    echo ""
-    echo "============== WARNING ==============="
-    echo ""
-    echo "It looks like you are running on default settings,"
-    echo "the reverse proxy may not work as you expect!"
-    echo ""
-    echo "PROXY_IP:    $proxy__ip"
-    echo "PROXY_PORT:  $proxy__port"
-    echo ""
-    echo "======================================"
-    echo ""
-    exit
-fi
-
-
-
-
-# Command is mandatory
-PROJECT_CMD=$1
-if [[ -z $PROJECT_CMD ]]; then
-    echo "Please input a command"
-    exit 1
-fi
-
-
-
-
-#
-# Server Commands
-#
-
-if [[ "up" == $PROJECT_CMD ]]; then
-    $SCRIPT_PATH config validate
-    [[ $? == 1 ]] && exit $?
-    $SCRIPT_PATH config generate
-    $SCRIPT_PATH proxy up -d
-    $SCRIPT_PATH humble up -d
-    exit 0;
-fi
-
-if [[ "start" == $PROJECT_CMD ]]; then
-    $SCRIPT_PATH proxy start
-    $SCRIPT_PATH humble start
-    exit 0;
-fi
-
-if [[ "stop" == $PROJECT_CMD ]]; then
-    $SCRIPT_PATH proxy stop
-    $SCRIPT_PATH humble stop
-    exit 0;
-fi
-
-if [[ "down" == $PROJECT_CMD ]]; then
-    $SCRIPT_PATH proxy down
-    $SCRIPT_PATH humble down
-    exit 0;
-fi
-
-if [[ "reboot" == $PROJECT_CMD ]]; then
-    $SCRIPT_PATH config validate
-    [[ $? == 1 ]] && exit $?
-    $SCRIPT_PATH down
-    $SCRIPT_PATH up
-    exit 0;
-fi
-
-if [[ "reload" == $PROJECT_CMD ]]; then
-    $SCRIPT_PATH config validate
-    [[ $? == 1 ]] && exit $?
-    $SCRIPT_PATH proxy stop
-    $SCRIPT_PATH config generate
-    $SCRIPT_PATH proxy up -d
-    exit 0;
-fi
-
-if [[ "config" == $PROJECT_CMD ]]; then
-    CONFIG_CMD=$2
-
-    if [[ "generate" == $CONFIG_CMD ]]; then
-
-        # Environment Overrides
-        for d in apps/*/ ; do
-            APP_NAME=$(basename "$d")
-            APP_OVERRIDE_FILE="$SCRIPT_ROOT/$d.env.override"
-            [[ -f $APP_OVERRIDE_FILE ]] && rm $APP_OVERRIDE_FILE
-
-            # Overriddable Variables
-            eval APP_ENV=\$"apps__${APP_NAME}__env"
-            eval APP_PORT=\$"apps__${APP_NAME}__port"
-            eval APP_HOST=\$"apps__${APP_NAME}__host"
-            eval APP_SKIP=\$"apps__${APP_NAME}__skip"
-
-            APP_OVERRIDE=""
-            [[ $APP_ENV != "" ]] && APP_OVERRIDE="$APP_OVERRIDE""HUMBLE_ENV=$APP_ENV "
-            [[ $APP_PORT != "" ]] && APP_OVERRIDE="$APP_OVERRIDE""HUMBLE_PORT=$APP_PORT "
-            [[ $APP_HOST != "" ]] && APP_OVERRIDE="$APP_OVERRIDE""HUMBLE_HOST=$APP_HOST "
-
-            [[ $APP_SKIP != "yes" ]] && [[ $APP_OVERRIDE != "" ]] && echo $APP_OVERRIDE | tr ' ' '\n' > $APP_OVERRIDE_FILE
-        done
-
-        # Static files
-        echo "SERVER_IP=$proxy__ip SERVER_PORT=$proxy__port " | tr ' ' '\n' > $CACHE_PATH/.env
-        cp -rf $TEMPLATES_ROOT/default-website $CACHE_PATH/
-        cp $TEMPLATES_ROOT/docker-compose.yml.tpl $CACHE_PATH/docker-compose.yml
-
-
-        # NGiNX Config File
-        CONFIG_FILE="$CACHE_PATH/nginx.conf"
-        CONFIG_FILE_TMP=$(mktemp "/tmp/proxy-gen.$(hash $CONFIG_FILE).$(date +%Y%m%d-%H%M%S).XXXXXX")
-        cp $TEMPLATES_ROOT/nginx.conf.tpl $CONFIG_FILE_TMP
-        sed -i -e "s/\$SERVER_PORT/$proxy__port/g" $CONFIG_FILE_TMP
-        cat $CONFIG_FILE_TMP > $CONFIG_FILE
-
-        # Apps Virtual Host Config Files
-        for d in apps/*/ ; do
-            HUMBLE_HOST=""
-            HUMBLE_PORT=""
-            APP_NAME=$(basename "$d")
-            eval APP_SKIP=\$"apps__${APP_NAME}__skip"
-            CONFIG_FILE="$SITES_ENABLED_PATH/$(hash $d).conf"
-            CONFIG_FILE_TMP=$(mktemp "/tmp/proxy-gen.$CACHE_NAME.$(hash $d).$(date +%Y%m%d-%H%M%S).XXXXXX")
-
-            cp $TEMPLATES_ROOT/virtual-host.conf.tpl $CONFIG_FILE_TMP
-            sed -i -e "s/\$SERVER_IP/$proxy__ip/g" $CONFIG_FILE_TMP
-            sed -i -e "s/\$SERVER_PORT/$proxy__port/g" $CONFIG_FILE_TMP
-            HUMBLE_HOST=$(
-                cd $d
-                [ -f .env ] && source .env
-                [ -f .env.override ] && source .env.override
-                sed -i -e "s/\$HUMBLE_HOST/$HUMBLE_HOST/g" $CONFIG_FILE_TMP
-                echo $HUMBLE_HOST
-            )
-            HUMBLE_PORT=$(
-                cd $d
-                [ -f .env ] && source .env
-                [ -f .env.override ] && source .env.override
-                sed -i -e "s/\$HUMBLE_PORT/$HUMBLE_PORT/g" $CONFIG_FILE_TMP
-                echo $HUMBLE_PORT
-            )
-            # override former configuration by removing existing virtual host
-            rm -f $CONFIG_FILE
-            [[ $APP_SKIP != "yes" ]] && [[ $HUMBLE_HOST != "" ]] && cat $CONFIG_FILE_TMP > $CONFIG_FILE
-        done
-        exit 0
-    fi
-
-    if [[ "validate" == $CONFIG_CMD ]]; then
-        PORTS=""
-        for d in apps/*/ ; do
-            APP_NAME=$(basename "$d")
-            eval APP_SKIP=\$"apps__${APP_NAME}__skip"
-
-            APP_PORT_DEFAULT=$(cd $d && [ -f .env ] && source .env && echo $HUMBLE_PORT)
-            eval APP_PORT_OVERRIDE=\$"apps__${APP_NAME}__port"
-            APP_PORT=${APP_PORT_OVERRIDE:-$APP_PORT_DEFAULT}
-
-            if [[ $APP_SKIP != "yes" ]]; then
-                if [[ $PORTS == *"$APP_PORT;"* ]]; then
-                    echo ""
-                    echo "====== PORT CONFLICT DETECTED ======"
-                    echo ""
-                    echo ${PORTS%?} | tr ';' '\n'
-                    echo "$APP_NAME -> ${APP_PORT:-missing} << Check this!"
-                    echo ""
-                    if [[ $APP_PORT == $APP_PORT_OVERRIDE ]]; then
-                        echo "(looks like a \"$CONFIG_FILE\" error)"
-                    else
-                        echo "(looks like a \"$d.env\" error)"
-                    fi
-                    echo "===================================="
-                    echo ""
-                    exit 1
-                fi
-                PORTS="$PORTS$APP_NAME -> $APP_PORT;"
-            fi
-        done
-
-        HOSTS=""
-        for d in apps/*/ ; do
-            APP_NAME=$(basename "$d")
-            eval APP_SKIP=\$"apps__${APP_NAME}__skip"
-
-            APP_HOST_DEFAULT=$(cd $d && [ -f .env ] && source .env && echo $HUMBLE_HOST)
-            eval APP_HOST_OVERRIDE=\$"apps__${APP_NAME}__host"
-            APP_HOST_OVERRIDE=${APP_HOST_OVERRIDE:-$APP_NAME}
-            APP_HOST=${APP_HOST_OVERRIDE:-$APP_HOST_DEFAULT}
-
-            if [[ $APP_SKIP != "yes" ]]; then
-                if [[ $HOSTS == *"$APP_HOST"* ]]; then
-                    echo ""
-                    echo "====== HOST CONFLICT DETECTED ======"
-                    echo ""
-                    echo ${HOSTS%?} | tr ';' '\n'
-                    echo "$APP_NAME -> ${APP_HOST:-missing} << Check this!"
-                    echo ""
-                    if [[ $APP_HOST == $APP_HOST_OVERRIDE ]]; then
-                        echo "(looks like a \"$CONFIG_FILE\" error)"
-                    else
-                        echo "(looks like a \"$d.env\" error)"
-                    fi
-                    echo "===================================="
-                    echo ""
-                    exit 1
-                fi
-                HOSTS="$HOSTS$APP_NAME -> $APP_HOST;"
-            fi
-        done
-        exit 0
-    fi
-
-    if [[ "html" == $CONFIG_CMD ]]; then
-        TEMPLATE_PATH=$TEMPLATES_ROOT/default-website
-        EDITOR_CMD=${3:-vi}
-        $EDITOR_CMD $TEMPLATE_PATH
-        exit
-    fi
-
-    if [[ "nginx" == $CONFIG_CMD ]]; then
-        TEMPLATE_PATH=$TEMPLATES_ROOT/nginx.conf.tpl
-        EDITOR_CMD=${3:-vi}
-        $EDITOR_CMD $TEMPLATE_PATH
-        exit
-    fi
-
-    if [[ "vhost" == $CONFIG_CMD ]]; then
-        TEMPLATE_PATH=$TEMPLATES_ROOT/virtual-host.conf.tpl
-        EDITOR_CMD=${3:-vi}
-        $EDITOR_CMD $TEMPLATE_PATH
-        exit
-    fi
-
-    if [[ "compose" == $CONFIG_CMD ]]; then
-        TEMPLATE_PATH=$TEMPLATES_ROOT/docker-compose.yml.tpl
-        EDITOR_CMD=${3:-vi}
-        $EDITOR_CMD $TEMPLATE_PATH
-        exit
-    fi
-
-fi
-
-
-
-#
-# NGiNX PROXY
-# Execute docker compose targeting the proxy server
-#
-
-if [[ "proxy" == $PROJECT_CMD ]]; then
-    PROXY_CMD=$2
-    ( cd $CACHE_PATH && docker-compose $PROXY_CMD ${@:3} )
+# Force update
+if [[ "--update" == $1 ]]; then
+    rm -f $CACHE_FILE
+    $SCRIPT_PATH ${@:2}
     exit 0
 fi
 
-
-
-
-#
-# Run docker-compose over every app
-#
-
-if [[ "humble" == $PROJECT_CMD ]]; then
-    COMPOSE_CMD=$2
-    for d in apps/*/ ; do
-        APP_NAME=$(basename "$d")
-        eval SKIP_APP=\$"apps__${APP_NAME}__skip"
-        if [[ $SKIP_APP == "yes" ]]; then
-            echo "Skip $d"
-        else
-            echo "Boot... $d"
-            ( cd $d && ./humble $COMPOSE_CMD ${@:3} )
-        fi
-    done
+# Download the file
+if [ ! -f $CACHE_FILE ]; then
+    echo ""
+    echo ""
+    echo "========== RETRIEVE THE SCRIPT ==========="
+    if [ $(which wget) ] ; then
+        wget -O $CACHE_FILE $GIST_URL
+    else
+        curl -L -o $CACHE_FILE $GIST_URL
+    fi
+    chmod +x $CACHE_FILE
+    echo "=========================================="
+    echo ""
+    echo ""
 fi
 
-
-
-
-#
-# project > target a specific app
-#
-
-if [ ! -f $1 ]; then
-    for d in apps/*/ ; do
-        if [[ $d == *"$1"* ]]; then
-          ( cd $d && ./humble ${@:2} )
-          exit 0;
-        fi
-    done
-fi
+# Execute the command
+SCRIPT_ROOT=$SCRIPT_ROOT SCRIPT_NAME=$SCRIPT_NAME $CACHE_FILE $@

@@ -6,5 +6,7 @@ services:
             - ../.humble-server/api:/server-api
         environment:
             - NODE_ENV=${NODE_ENV}
-        ports:
-            - ${HUMBLE_PORT}:8080
+
+    ui:
+        environment:
+            - NODE_ENV=${NODE_ENV}

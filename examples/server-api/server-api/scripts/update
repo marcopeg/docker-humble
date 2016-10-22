@@ -1,0 +1,6 @@
+#
+# use this for new production releases
+#
+
+git pull
+./humble run dev
