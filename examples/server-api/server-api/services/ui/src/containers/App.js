@@ -3,28 +3,10 @@ import React from 'react';
 import { connect } from 'react-redux';
 import Avenger from 'components/Avenger';
 
-
-
 class App extends React.Component {
-
-    // componentWillMount () {
-    //     let apiEndpoint = process.env.API_ROOT + '/avengers';
-    //     if ('development' === process.env.NODE_ENV) {
-    //         console.log("Fetch data from:", apiEndpoint);
-    //     }
-    //     // request.get(apiEndpoint)
-    //     //     .set('Accept', 'application/json')
-    //     //     .then(res => this.setState({
-    //     //         avengers: res.body,
-    //     //     }))
-    //     //     .catch(err => {
-    //     //         console.error(err);
-    //     //         alert("Can't fetch data from api!");
-    //     //     });
-    // }
-
     render () {
-        let { avengers } = this.props;
+        let { avengers, filter, dispatch } = this.props;
+        let input;
         return (
             <div>
                 <h2>Avengers:</h2>
@@ -33,9 +15,17 @@ class App extends React.Component {
                         <Avenger key={key} {...props} />
                     ))}
                 </ul>
+                <h4>Filter: {filter}</h4>
+                <input ref={node => input = node} />
+                <button onClick={() => dispatch({type: 'add', value: input.value})}>Add</button>
             </div>
         );
     }
 }
 
-export default connect(state => state.app)(App)
+export default connect((state, ownProps) => {
+    return {
+        avengers: state.app.avengers,
+        filter: ownProps.params.filter
+    };
+})(App)

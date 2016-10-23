@@ -1,7 +1,7 @@
 
 export const INITIAL_STATE = {
     title: 'React Client',
-    avengers: [{name:'foo'},{name:'faa'}],
+    avengers: [{name:'IronMan'},{name:'Hulk'}, {name:'CaptainAmerica'}],
 };
 
 export function appReducer(state = INITIAL_STATE, action) {
@@ -10,7 +10,7 @@ export function appReducer(state = INITIAL_STATE, action) {
         case 'add':
             return {
                 ...state,
-                avengers: [...state.avengers, {name:'fii'}],
+                avengers: [...state.avengers, {name:action.value}],
             };
         default: return state;
     }

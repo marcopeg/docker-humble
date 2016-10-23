@@ -1,10 +1,11 @@
 
 import { createStore, combineReducers, applyMiddleware, compose } from 'redux';
 import reduxThunk from 'redux-thunk';
+import reduxPromise from 'redux-promise';
 
 import { reducers } from 'reducers';
 const reducer = combineReducers(reducers);
-const middlewares = [reduxThunk];
+const middlewares = [reduxThunk, reduxPromise];
 
 var store;
 

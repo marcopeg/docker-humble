@@ -1,33 +1,29 @@
 
 import React from 'react';
 import { render } from 'react-dom';
-import request from 'superagent';
+import { Provider } from 'react-redux';
 
-import { makeStore } from 'utils/store';
-import { Main } from 'utils/Main';
-
-import App from 'containers/App';
+import { makeStore } from 'store';
+import Router from 'containers/Router';
 
 if ('development' === process.env.NODE_ENV) {
     console.log("*** DEVELOPMENT MODE ***");
 }
 
-let store = makeStore({});
+let store = makeStore();
 let targetEl = document.getElementById('app');
 
-render((
-    <Main
-        app={App}
-        store={store} />
-), targetEl);
+const Root = ({ store, app }) => (
+    <Provider store={store}>
+        {React.createElement(app)}
+    </Provider>
+)
+
+render((<Root store={store} app={Router} />), targetEl);
 
 if (module.hot) {
     module.hot.accept('containers/App', () => {
-        const App = require('containers/App').default;
-        render((
-            <Main
-                app={App}
-                store={store} />
-            ), targetEl);
+        const Router = require('containers/Router').default;
+        render((<Root store={store} app={Router} />), targetEl);
     });
 }

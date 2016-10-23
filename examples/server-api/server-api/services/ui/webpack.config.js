@@ -7,12 +7,7 @@ var APP_DIR = path.resolve(__dirname, 'src');
 
 var config = {
     entry: {
-        app: [
-            'react-hot-loader/patch',
-            'webpack-dev-server/client?http://0.0.0.0:3000',
-            'webpack/hot/only-dev-server',
-            APP_DIR + '/app.js'
-        ]
+        app: APP_DIR + '/app.js',
     },
     output: {
         path: BUILD_DIR,
@@ -48,7 +43,6 @@ var config = {
         ]
     },
     plugins: [
-        new webpack.HotModuleReplacementPlugin(),
         new webpack.DefinePlugin({
             'process.env': JSON.stringify(process.env),
         }),
@@ -61,7 +55,6 @@ var config = {
         ],
     },
     devServer: {
-        hot: true,
         historyApiFallback: {
             index: '/index.html',
         },

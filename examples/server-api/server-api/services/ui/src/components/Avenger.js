@@ -1,8 +1,10 @@
 import React from 'react';
+import { Link } from 'react-router';
 
-export default class Avenger extends React.Component {
-    render () {
-        let { name } = this.props;
-        return <li>{name}</li>;
-    }
-}
+const Avenger = ({ name }) => (
+    <li>
+        <Link to={name}>{name}</Link>
+    </li>
+);
+
+export default Avenger;
