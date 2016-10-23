@@ -2,11 +2,13 @@
 import React, { PropTypes } from 'react';
 import { Router, Route, browserHistory } from 'react-router';
 
-import App from 'containers/App';
+import AppsListPage from 'containers/AppsListPage';
+import AppPage from 'containers/AppPage';
 
 const Root = () => (
     <Router history={browserHistory}>
-        <Route path="/(:filter)" component={App} />
+        <Route path="/" component={AppsListPage} />
+        <Route path="/(:appName)" component={AppPage} />
     </Router>
 );
 

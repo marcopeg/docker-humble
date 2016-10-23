@@ -1,7 +1,11 @@
 
 import React from 'react';
 import { connect } from 'react-redux';
-import Avenger from 'components/Avenger';
+import AppsListPage from 'containers/AppsListPage';
+
+function state2props() {
+    return {};
+}
 
 class App extends React.Component {
     render () {
@@ -9,23 +13,10 @@ class App extends React.Component {
         let input;
         return (
             <div>
-                <h2>Avengers:</h2>
-                <ul>
-                    {avengers.map((props, key) => (
-                        <Avenger key={key} {...props} />
-                    ))}
-                </ul>
-                <h4>Filter: {filter}</h4>
-                <input ref={node => input = node} />
-                <button onClick={() => dispatch({type: 'add', value: input.value})}>Add</button>
+                <AppsListPage />
             </div>
         );
     }
 }
 
-export default connect((state, ownProps) => {
-    return {
-        avengers: state.app.avengers,
-        filter: ownProps.params.filter
-    };
-})(App)
+export default connect(state2props)(App);

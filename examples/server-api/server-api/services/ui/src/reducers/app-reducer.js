@@ -1,17 +1,12 @@
 
 export const INITIAL_STATE = {
-    title: 'React Client',
-    avengers: [{name:'IronMan'},{name:'Hulk'}, {name:'CaptainAmerica'}],
+    title: 'Humble Server',
+    ip: '0.0.0.0',
 };
 
 export function appReducer(state = INITIAL_STATE, action) {
     var { type } = action;
     switch (type) {
-        case 'add':
-            return {
-                ...state,
-                avengers: [...state.avengers, {name:action.value}],
-            };
         default: return state;
     }
 }

@@ -10,9 +10,7 @@ if ('development' === process.env.NODE_ENV) {
 }
 
 app.use(bodyParser.json({ limit: '1mb' }));
-app.use('/proxy', require('./routes/proxy'));
-app.use('/app', require('./routes/app'));
-
+app.use('/', require('./routes/info'));
 app.get('/', (req, res) => res.send('+ok'));
 
 app.listen(8080, () => {
