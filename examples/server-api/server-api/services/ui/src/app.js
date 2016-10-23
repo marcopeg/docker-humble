@@ -1,4 +1,6 @@
 
+import styles from './app.scss';
+
 import React from 'react';
 import { render } from 'react-dom';
 import { Provider } from 'react-redux';

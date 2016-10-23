@@ -40,6 +40,30 @@ var config = {
                 test: /\.scss$/,
                 loaders: ['style', 'css', 'sass'],
             },
+            {
+                test: /\.(jpe?g|png|gif|svg)$/i,
+                loader: 'url!img?optimizationLevel=7',
+            },
+            {
+                test: /\.woff(\?v=\d+\.\d+\.\d+)?$/,
+                loader: 'url?mimetype=application/font-woff',
+            },
+            {
+                test: /\.woff2(\?v=\d+\.\d+\.\d+)?$/,
+                loader: 'url?mimetype=application/font-woff',
+            },
+            {
+                test: /\.ttf(\?v=\d+\.\d+\.\d+)?$/,
+                loader: 'url?mimetype=application/octet-stream',
+            },
+            {
+                test: /\.eot(\?v=\d+\.\d+\.\d+)?$/,
+                loader: 'url?mimetype=application/vnd.ms-fontobject',
+            },
+            {
+                test: /\.svg(\?v=\d+\.\d+\.\d+)?$/,
+                loader: 'url?mimetype=image/svg+xml',
+            },
         ]
     },
     plugins: [
