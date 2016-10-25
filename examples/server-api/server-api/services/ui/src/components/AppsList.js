@@ -6,9 +6,9 @@ import { Link } from 'react-router';
 
 const AppsList = ({ items }) => (
     <ListGroup>
-        {items.map(item => (
-            <Link to={item} key={item} className={'list-group-item'}>
-                {item}
+        {items.map(app => (
+            <Link to={app.id} key={app.id} className={'list-group-item'}>
+                {app.host || app.name || app.id}
             </Link>
         ))}
     </ListGroup>

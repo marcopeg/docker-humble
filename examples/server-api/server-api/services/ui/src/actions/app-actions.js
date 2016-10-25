@@ -1,9 +1,9 @@
 
 export const SET_ERROR = 'setError@app';
 
-export const setError = err => {
+export const setError = error => {
     return {
         type: SET_ERROR,
-        err,
-    };
+        error,
+    }
 }

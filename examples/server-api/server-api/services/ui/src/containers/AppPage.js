@@ -12,23 +12,29 @@ import Glyphicon from 'react-bootstrap/lib/Glyphicon';
 import { LinkContainer } from 'react-router-bootstrap';
 
 function state2props(state, router) {
+    let { appId } = router.params;
+    let { apps } = state;
+    let data = apps[appId] || {};
+    
     return {
-        name: router.params.appName,
+        appId: appId,
+        displayName: data.host || data.name || appId,
+        services: data.services || [],
     };
 }
 
 class AppPage extends React.Component {
 
     componentWillMount() {
-        this.props.dispatch(startPollAppData(this.props.name));
+        this.props.dispatch(startPollAppData(this.props.appId));
     }
 
     componentWillUnmount() {
-        this.props.dispatch(stopPollAppData(this.props.name));
+        this.props.dispatch(stopPollAppData(this.props.appId));
     }
 
     render () {
-        let { name } = this.props;
+        let { displayName, services } = this.props;
         return (
             <Grid>
                 <PageHeader>
@@ -37,10 +43,11 @@ class AppPage extends React.Component {
                             <Glyphicon glyph="chevron-left" />
                         </Button>
                     </LinkContainer>
-                    {name}
+                    {displayName}
                 </PageHeader>
 
                 <h4>Services:</h4>
+                {services.toString()}
 
             </Grid>
         );

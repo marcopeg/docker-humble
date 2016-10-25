@@ -1,9 +1,10 @@
 
 import { post } from 'utils/api';
 import { setError } from 'actions/app-actions';
-import { setInfo } from 'actions/apps-actions';
+import { setServices as setAppServices } from 'actions/apps-actions';
+import { setInfo as setServiceInfo } from 'actions/services-actions';
 
-const pollingDelay = 999999999;
+const pollingDelay = 5000;
 let activePolling = {};
 
 export const startPollAppData = appName => dispatch => {
@@ -11,6 +12,7 @@ export const startPollAppData = appName => dispatch => {
 };
 
 export const stopPollAppData = appName => dispatch => {
+    console.log('stop poll', appName);
     clearTimeout(activePolling[appName]);
     activePolling[appName] = null;
 };
@@ -23,11 +25,20 @@ const pollAppData = (appName, dispatch) => {
     console.log('poll', appName);
     post(appName)
         .then(res => {
-            console.log(res);
-            dispatch(setInfo(appName, res.body));
+            let { id: appId, services } = res.body;
+
+            // update app's services
+            dispatch(setAppServices(appId, Object.keys(services)));
+
+            // update each service info
+            Object.keys(services)
+                .map(_ => services[_])
+                .forEach(_ => dispatch(setServiceInfo(appId, _)));
+
             nextPoll();
         })
         .catch(err => {
+            console.error(err);
             dispatch(setError(err))
             nextPoll();
         });

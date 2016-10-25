@@ -1,12 +1,22 @@
 
+import { SET_ERROR } from 'actions/app-actions';
+
 export const INITIAL_STATE = {
-    title: 'Humble Server',
-    ip: '0.0.0.0',
+    error: null,
 };
 
-export function appReducer(state = INITIAL_STATE, action) {
+export const appReducer = (state = INITIAL_STATE, action) => {
     var { type } = action;
     switch (type) {
+        case SET_ERROR: return setError(state, action);
         default: return state;
+    }
+}
+
+const setError = (state, action) => {
+    let { error } = action;
+    return {
+        ...state,
+        error,
     }
 }

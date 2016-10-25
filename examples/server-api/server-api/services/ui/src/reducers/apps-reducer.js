@@ -1,9 +1,12 @@
 
-import { SET_LIST, SET_INFO } from 'actions/apps-actions';
+import {
+    SET_LIST,
+    SET_INFO,
+    SET_SERVICES,
+} from 'actions/apps-actions';
 
 export const INITIAL_STATE = {
-    items: [],
-    info: {},
+    _list: [],
 };
 
 export function appsReducer(state = INITIAL_STATE, action) {
@@ -11,20 +14,41 @@ export function appsReducer(state = INITIAL_STATE, action) {
     switch (type) {
         case SET_LIST: return setList(state, action);
         case SET_INFO: return setInfo(state, action);
+        case SET_SERVICES: return setServices(state, action);
         default: return state;
     }
 }
 
 function setList(state, action) {
-    let { items } = action;
-    return { ...state, items: items };
+    let { list } = action;
+    return {
+        ...state,
+        _list: list,
+    }
 }
 
 function setInfo(state, action) {
-    let { items, name, data } = action;
+    let { data } = action;
+    let { id, name, host, port } = data;
 
-    let info = { ...state.info };
-    info[name] = data;
+    let appData = state[id] || {};
+    appData.id = id;
+    appData.name = name;
+    appData.host = host;
+    appData.port = port;
 
-    return { ...state, info};
+    return {
+        ...state,
+        [id]: appData,
+    }
+}
+
+function setServices(state, action) {
+    let { appId, services } = action;
+    let appData = state[appId] || {};
+    appData.services = services;
+    return {
+        ...state,
+        [appId]: appData,
+    }
 }

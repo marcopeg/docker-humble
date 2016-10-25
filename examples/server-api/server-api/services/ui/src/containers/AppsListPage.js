@@ -1,7 +1,6 @@
 
 import React from 'react';
 import { connect } from 'react-redux';
-import { fetchApps } from 'services/apps-service';
 
 import Grid from 'react-bootstrap/lib/Grid';
 import PageHeader from 'react-bootstrap/lib/PageHeader';
@@ -9,25 +8,25 @@ import PageHeader from 'react-bootstrap/lib/PageHeader';
 import AppsList from 'components/AppsList';
 
 function state2props(state) {
+    let { proxy, apps } = state;
     return {
-        ip: state.app.ip,
-        items: state.apps.items,
+        ip: proxy.ip,
+        apps: apps._list
+                .map(_ => apps[_])
+                .filter(_ => _ !== undefined),
     };
 }
 
 class AppsListPage extends React.Component {
-    componentWillMount() {
-        this.props.dispatch(fetchApps());
-    }
-
     render () {
-        let { items, ip } = this.props;
+        let { apps, ip } = this.props;
+        console.log(apps);
         return (
             <Grid>
                 <PageHeader>
                     {ip}
                 </PageHeader>
-                <AppsList items={items} />
+                <AppsList items={apps} />
             </Grid>
         );
     }

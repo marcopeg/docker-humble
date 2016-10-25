@@ -1,21 +1,21 @@
 
 import React from 'react';
 import { connect } from 'react-redux';
-import AppsListPage from 'containers/AppsListPage';
+import { fetchServerInfo } from 'services/fetch-info-service';
 
-function state2props() {
+function state2props(state, router) {
     return {};
 }
 
 class App extends React.Component {
+
+    componentWillMount() {
+        this.props.dispatch(fetchServerInfo());
+    }
+
     render () {
-        let { avengers, filter, dispatch } = this.props;
-        let input;
-        return (
-            <div>
-                <AppsListPage />
-            </div>
-        );
+        let { children } = this.props;
+        return children;
     }
 }
 
