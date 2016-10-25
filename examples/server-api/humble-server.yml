@@ -1,7 +1,7 @@
 version: '1'
 
 proxy:
-    ip: 192.168.1.239
+    ip: 10.10.20.153
     port: 8080
 
 apps:

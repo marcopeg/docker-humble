@@ -5,15 +5,19 @@
   "main": "index.js",
   "scripts": {
     "start": "node index",
-    "dev:start": "npm install && supervisor index"
+    "dev:start": "npm install && supervisor index",
+    "test": "find ./test -name '*.spec.js' | xargs mocha -R spec -w"
   },
   "author": "Marco Pegoraro",
   "license": "MIT",
   "dependencies": {
     "async": "^2.1.2",
     "body-parser": "^1.15.2",
+    "chai": "^3.5.0",
     "express": "^4.14.0",
-    "node-yaml": "^3.0.3"
+    "extend": "^3.0.0",
+    "node-yaml": "^3.0.3",
+    "sinon": "^1.17.6"
   },
   "devDependencies": {
     "supervisor": "^0.11.0"
