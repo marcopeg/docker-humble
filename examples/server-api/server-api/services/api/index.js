@@ -17,6 +17,9 @@ app.use('/cache',
 app.use('/proxy',
     require('./routes/proxy'));
 
+app.use('/app',
+    require('./routes/app'));
+
 app.get('/', (req, res) => res.send('+ok'));
 
 app.listen(8080, () => {
