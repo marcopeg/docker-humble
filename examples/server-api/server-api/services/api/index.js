@@ -17,7 +17,7 @@ app.use('/cache',
 app.use('/proxy',
     require('./routes/proxy'));
 
-app.use('/app',
+app.use('/a',
     require('./routes/app'));
 
 app.get('/', (req, res) => res.send('+ok'));
