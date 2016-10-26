@@ -27,8 +27,8 @@ exports.stop = () => {
 };
 
 exports.refresh = () => {
-    clearTimeout(_clock);
-    loop();
+    exports.stop();
+    exports.start();
 };
 
 exports.snapshot = () => {
@@ -37,7 +37,7 @@ exports.snapshot = () => {
 
 const loop = () => {
     console.log('check proxy');
-    getProxyConfiguration()
+    return getProxyConfiguration()
         .then(updateCache)
         .then(nextTick)
         .catch(err => {

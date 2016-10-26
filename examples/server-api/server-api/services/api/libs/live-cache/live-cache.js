@@ -21,6 +21,12 @@ exports.stop = () => {
     isRunning = false;
 };
 
+exports.refresh = () => {
+    services.refresh();
+    apps.refresh();
+    proxy.refresh();
+};
+
 exports.isRunning = () => {
     return isRunning;
 }

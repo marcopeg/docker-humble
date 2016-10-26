@@ -22,6 +22,11 @@ exports.stop = () => {
     Object.keys(_clocks).forEach(appId => clearTimeout(_clocks[appId]));
 };
 
+exports.refresh = () => {
+    exports.stop();
+    exports.start();
+};
+
 exports.snapshot = () => {
     let snap = extend(true, cache);
     Object.keys(snap).forEach(appId => {

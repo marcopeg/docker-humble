@@ -19,6 +19,11 @@ exports.stop = () => {
     cache.forEach(service => clearTimeout(service._clock))
 };
 
+exports.refresh = () => {
+    exports.stop();
+    exports.start();
+};
+
 exports.snapshot = appId => {
     let snap = {};
     cache

@@ -1,10 +1,9 @@
 
-var express = require('express');
+const express = require('express');
 const bodyParser = require('body-parser');
+const corsMiddleware = require('./middlewares/cors');
 
-var corsMiddleware = require('./middlewares/cors');
-let liveCacheMiddleware = require('./middlewares/live-cache');
-var app = express();
+let app = express();
 
 if ('development' === process.env.NODE_ENV) {
     app.use(corsMiddleware('*'));
@@ -13,7 +12,6 @@ if ('development' === process.env.NODE_ENV) {
 app.use(bodyParser.json({ limit: '1mb' }));
 
 app.use('/cache',
-    liveCacheMiddleware(),
     require('./routes/cache'));
 
 app.get('/', (req, res) => res.send('+ok'));
