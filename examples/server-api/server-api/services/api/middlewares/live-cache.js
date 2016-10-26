@@ -19,7 +19,7 @@ module.exports = timeout => {
     }
 
     // first cache round on boot
-    //doit();
+    doit();
 
     // return the middleware
     return (req, res, next) => {

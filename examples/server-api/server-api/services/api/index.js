@@ -14,6 +14,9 @@ app.use(bodyParser.json({ limit: '1mb' }));
 app.use('/cache',
     require('./routes/cache'));
 
+app.use('/proxy',
+    require('./routes/proxy'));
+
 app.get('/', (req, res) => res.send('+ok'));
 
 app.listen(8080, () => {

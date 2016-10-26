@@ -22,6 +22,7 @@ exports.stop = () => {
 };
 
 exports.refresh = () => {
+    console.log('liveCache refresh');
     services.refresh();
     apps.refresh();
     proxy.refresh();
