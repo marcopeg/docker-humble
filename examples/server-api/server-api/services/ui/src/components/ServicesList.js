@@ -4,13 +4,11 @@ import ListGroup from 'react-bootstrap/lib/ListGroup';
 import ListGroupItem from 'react-bootstrap/lib/ListGroupItem';
 import { Link } from 'react-router';
 
+import ServicesListItem from 'components/ServicesListItem';
+
 const ServicesList = ({ items }) => (
     <ListGroup>
-        {items.map(service => (
-            <Link to={service.id} key={service.id} className={'list-group-item'}>
-                {service.id}
-            </Link>
-        ))}
+        {items.map(service => <ServicesListItem key={service.id} {...service} />)}
     </ListGroup>
 );
 

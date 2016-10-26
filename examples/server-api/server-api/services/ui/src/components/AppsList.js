@@ -1,15 +1,14 @@
 
 import React from 'react';
+
 import ListGroup from 'react-bootstrap/lib/ListGroup';
-import ListGroupItem from 'react-bootstrap/lib/ListGroupItem';
-import { Link } from 'react-router';
+
+import AppsListItem from 'components/AppsListItem';
 
 const AppsList = ({ items }) => (
     <ListGroup>
         {items.map(app => (
-            <Link to={app.id} key={app.id} className={'list-group-item'}>
-                {app.host || app.name || app.id}
-            </Link>
+            <AppsListItem key={app.id} {...app} />
         ))}
     </ListGroup>
 );

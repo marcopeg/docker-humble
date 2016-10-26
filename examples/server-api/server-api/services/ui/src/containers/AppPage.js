@@ -11,6 +11,7 @@ import Glyphicon from 'react-bootstrap/lib/Glyphicon';
 import { LinkContainer } from 'react-router-bootstrap';
 
 import ServicesList from 'components/ServicesList';
+import Status from 'components/Status';
 
 function state2props(state, router) {
     let { appId } = router.params;
@@ -25,7 +26,7 @@ function state2props(state, router) {
         };
     }
 
-    let { host } = app;
+    let { host, isRunning, isReady } = app;
     let services = Object.keys(app.services).map(serviceId => {
         let service = app.services[serviceId];
         service.id = serviceId;
@@ -36,21 +37,32 @@ function state2props(state, router) {
         appId,
         services,
         displayName: host || appId,
+        isRunning,
+        isReady,
     };
 }
 
 class AppPage extends React.Component {
     render () {
-        let { displayName, services } = this.props;
+        let { displayName, services, isRunning, isReady } = this.props;
         return (
             <Grid>
                 <PageHeader>
-                    <LinkContainer to="/">
-                        <Button bsStyle="link">
-                            <Glyphicon glyph="chevron-left" />
-                        </Button>
-                    </LinkContainer>
-                    {displayName}
+                    <Grid fluid>
+                        <Row>
+                            <Col xs={11}>
+                                <LinkContainer to="/">
+                                    <Button bsStyle="link">
+                                        <Glyphicon glyph="chevron-left" />
+                                    </Button>
+                                </LinkContainer>
+                                {displayName}
+                            </Col>
+                            <Col xs={1} className="text-left">
+                                <Status {...{isRunning, isReady, size: 20}} />
+                            </Col>
+                        </Row>
+                    </Grid>
                 </PageHeader>
 
                 <h4>Services:</h4>
