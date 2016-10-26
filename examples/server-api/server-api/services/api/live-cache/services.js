@@ -1,10 +1,12 @@
 
 const extend = require('extend');
 const Cmd = require('../libs/cmd');
+const settings = require('./settings');
 
 let _clocks = {};
 let isRunning = false;
 let cache = [];
+
 
 exports.start = () => {
     isRunning = true;
@@ -66,7 +68,7 @@ const nextTick = service => {
     if (!isRunning) {
         return;
     }
-    service._clock = setTimeout(() => loop(service), 10000);
+    service._clock = setTimeout(() => loop(service), settings.getUpdateDelay());
 }
 
 const getServiceInfo = service => new Promise((resolve, reject) => {

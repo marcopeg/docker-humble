@@ -4,6 +4,7 @@ const path = require('path');
 const yaml = require('node-yaml');
 const extend = require('extend');
 
+const settings = require('./settings');
 const apps = require('./apps');
 
 let _clock;
@@ -47,7 +48,7 @@ const nextTick = () => {
     if (!isRunning) {
         return;
     }
-    _clock = setTimeout(loop, 15000);
+    _clock = setTimeout(loop, settings.getUpdateDelay());
 }
 
 const getProxyConfiguration = () => new Promise((resolve, reject) => {

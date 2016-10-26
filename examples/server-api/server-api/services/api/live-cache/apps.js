@@ -3,6 +3,7 @@ const extend = require('extend');
 const yaml = require('node-yaml');
 const Cmd = require('../libs/cmd');
 
+const settings = require('./settings');
 const services = require('./services');
 
 let _clocks = {};
@@ -72,7 +73,7 @@ const nextTick = appId => {
     if (!isRunning) {
         return;
     }
-    _clocks[appId] = setTimeout(() => loop(appId), 5000);
+    _clocks[appId] = setTimeout(() => loop(appId), settings.getUpdateDelay());
 }
 
 const getAppConfiguration = appId => new Promise((resolve, reject) => {
