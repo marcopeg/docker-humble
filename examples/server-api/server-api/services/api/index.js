@@ -2,6 +2,9 @@
 var express = require('express');
 const bodyParser = require('body-parser');
 
+const liveCache = require('./live-cache');
+liveCache.start();
+
 var corsMiddleware = require('./middlewares/cors');
 var app = express();
 

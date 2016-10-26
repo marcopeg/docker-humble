@@ -17,8 +17,15 @@ const getServiceCid = require('../promises/get-service-cid');
 const getServiceInfo = require('../promises/get-service-info');
 const buildServiceOutput = require('../promises/build-service-output');
 
+const liveCache = require('../live-cache');
+
 const router = express.Router();
 module.exports = router;
+
+router.post('/snapshot', (req, res) => {
+    res.send(liveCache.snapshot());
+});
+
 
 router.post('/server',
     (req, res) => Promise.resolve({})
