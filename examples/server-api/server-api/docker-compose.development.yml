@@ -11,15 +11,15 @@ services:
         ports:
             - ${API_PORT}:8080
 
-    # ui:
-    #     image: marcopeg/node:0.1.0
-    #     volumes:
-    #         - ./services/ui:/usr/src/app
-    #     environment:
-    #         - API_ROOT=http://localhost:${API_PORT}
-    #     ports:
-    #         - ${HUMBLE_PORT}:8080
-    #     entrypoint:
-    #         - npm
-    #         - run
-    #         - start
+    ui:
+        image: marcopeg/node:0.1.0
+        volumes:
+            - ./services/ui:/usr/src/app
+        environment:
+            - API_ROOT=http://localhost:${API_PORT}
+        ports:
+            - ${HUMBLE_PORT}:8080
+        entrypoint:
+            - npm
+            - run
+            - start

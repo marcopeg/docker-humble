@@ -1,7 +1,6 @@
 
 import React from 'react';
 import { connect } from 'react-redux';
-import { startPollAppData, stopPollAppData } from 'services/poll-service';
 
 import Grid from 'react-bootstrap/lib/Grid';
 import Row from 'react-bootstrap/lib/Row';
@@ -11,28 +10,36 @@ import Button from 'react-bootstrap/lib/Button';
 import Glyphicon from 'react-bootstrap/lib/Glyphicon';
 import { LinkContainer } from 'react-router-bootstrap';
 
+import ServicesList from 'components/ServicesList';
+
 function state2props(state, router) {
     let { appId } = router.params;
-    let { apps } = state;
-    let data = apps[appId] || {};
-    
+    let { cache } = state;
+    let app = cache.apps[appId];
+
+    if (!app) {
+        return {
+            appId,
+            displayName: 'loading...',
+            services: [],
+        };
+    }
+
+    let { host } = app;
+    let services = Object.keys(app.services).map(serviceId => {
+        let service = app.services[serviceId];
+        service.id = serviceId;
+        return service;
+    });
+
     return {
-        appId: appId,
-        displayName: data.host || data.name || appId,
-        services: data.services || [],
+        appId,
+        services,
+        displayName: host || appId,
     };
 }
 
 class AppPage extends React.Component {
-
-    componentWillMount() {
-        this.props.dispatch(startPollAppData(this.props.appId));
-    }
-
-    componentWillUnmount() {
-        this.props.dispatch(stopPollAppData(this.props.appId));
-    }
-
     render () {
         let { displayName, services } = this.props;
         return (
@@ -47,7 +54,7 @@ class AppPage extends React.Component {
                 </PageHeader>
 
                 <h4>Services:</h4>
-                {services.toString()}
+                <ServicesList items={services} />
 
             </Grid>
         );

@@ -1,5 +1,5 @@
 
-import { SET_ERROR } from 'actions/app-actions';
+import { SET_ERROR } from 'actions/app-actions';
 
 export const INITIAL_STATE = {
     error: null,

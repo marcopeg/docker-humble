@@ -1,45 +1,33 @@
 
 import { post } from 'utils/api';
-import { setError } from 'actions/app-actions';
-import { setServices as setAppServices } from 'actions/apps-actions';
-import { setInfo as setServiceInfo } from 'actions/services-actions';
+import { setError, setCache } from 'actions/app-actions';
 
-const pollingDelay = 5000;
-let activePolling = {};
+const POLL_INTERVAL = 5000;
+let isPolling, _pollingTimer;
 
-export const startPollAppData = appName => dispatch => {
-    pollAppData(appName, dispatch);
+export const start = () => dispatch => {
+    isPolling = true;
+    pollCache(dispatch);
 };
 
-export const stopPollAppData = appName => dispatch => {
-    console.log('stop poll', appName);
-    clearTimeout(activePolling[appName]);
-    activePolling[appName] = null;
+export const stop = () => dispatch => {
+    isPolling = true;
+    pollCache(dispatch);
 };
 
-const pollAppData = (appName, dispatch) => {
-    const nextPoll = () => {
-        activePolling[appName] = setTimeout(() => pollAppData(appName, dispatch), pollingDelay);
+const pollCache = dispatch => post('/cache/snapshot')
+    .then(res => {
+        dispatch(setCache(res.body));
+        nextPoll(dispatch);
+    })
+    .catch(err => {
+        dispatch(setError(err));
+        nextPoll(dispatch);
+    });
+
+const nextPoll = dispatch => {
+    clearTimeout(_pollingTimer);
+    if (isPolling) {
+        _pollingTimer = setTimeout(() => pollCache(dispatch), POLL_INTERVAL);
     }
-
-    console.log('poll', appName);
-    post(appName)
-        .then(res => {
-            let { id: appId, services } = res.body;
-
-            // update app's services
-            dispatch(setAppServices(appId, Object.keys(services)));
-
-            // update each service info
-            Object.keys(services)
-                .map(_ => services[_])
-                .forEach(_ => dispatch(setServiceInfo(appId, _)));
-
-            nextPoll();
-        })
-        .catch(err => {
-            console.error(err);
-            dispatch(setError(err))
-            nextPoll();
-        });
-}
+};

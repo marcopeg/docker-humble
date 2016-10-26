@@ -8,19 +8,20 @@ import PageHeader from 'react-bootstrap/lib/PageHeader';
 import AppsList from 'components/AppsList';
 
 function state2props(state) {
-    let { proxy, apps } = state;
+    let { cache } = state;
+    let { proxy } = cache;
+
+    let apps = Object.keys(cache.apps).map(appId => cache.apps[appId]);
+
     return {
         ip: proxy.ip,
-        apps: apps._list
-                .map(_ => apps[_])
-                .filter(_ => _ !== undefined),
+        apps,
     };
 }
 
 class AppsListPage extends React.Component {
     render () {
         let { apps, ip } = this.props;
-        console.log(apps);
         return (
             <Grid>
                 <PageHeader>

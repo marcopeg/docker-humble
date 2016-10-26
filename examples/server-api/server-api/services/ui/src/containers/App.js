@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { connect } from 'react-redux';
-import { fetchServerInfo } from 'services/fetch-info-service';
+import { start as startPollCache } from 'services/poll-service';
 
 function state2props(state, router) {
     return {};
@@ -10,7 +10,7 @@ function state2props(state, router) {
 class App extends React.Component {
 
     componentWillMount() {
-        this.props.dispatch(fetchServerInfo());
+        this.props.dispatch(startPollCache());
     }
 
     render () {
