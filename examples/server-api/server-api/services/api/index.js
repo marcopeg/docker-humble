@@ -2,10 +2,8 @@
 var express = require('express');
 const bodyParser = require('body-parser');
 
-const liveCache = require('./live-cache');
-liveCache.start();
-
 var corsMiddleware = require('./middlewares/cors');
+let liveCacheMiddleware = require('./middlewares/live-cache');
 var app = express();
 
 if ('development' === process.env.NODE_ENV) {
@@ -13,7 +11,11 @@ if ('development' === process.env.NODE_ENV) {
 }
 
 app.use(bodyParser.json({ limit: '1mb' }));
-app.use('/', require('./routes/info'));
+
+app.use('/cache',
+    liveCacheMiddleware(),
+    require('./routes/cache'));
+
 app.get('/', (req, res) => res.send('+ok'));
 
 app.listen(8080, () => {

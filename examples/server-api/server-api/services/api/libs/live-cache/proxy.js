@@ -4,8 +4,10 @@ const path = require('path');
 const yaml = require('node-yaml');
 const extend = require('extend');
 
-const settings = require('./settings');
+const settings = require('../settings');
 const apps = require('./apps');
+
+const UPDATE_DELAY = 60 * 1000;
 
 let _clock;
 let isRunning = false;
@@ -34,6 +36,7 @@ exports.snapshot = () => {
 };
 
 const loop = () => {
+    console.log('check proxy');
     getProxyConfiguration()
         .then(updateCache)
         .then(nextTick)
@@ -48,7 +51,7 @@ const nextTick = () => {
     if (!isRunning) {
         return;
     }
-    _clock = setTimeout(loop, settings.getUpdateDelay());
+    _clock = setTimeout(loop, UPDATE_DELAY);
 }
 
 const getProxyConfiguration = () => new Promise((resolve, reject) => {

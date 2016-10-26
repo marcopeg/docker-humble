@@ -1,21 +1,22 @@
 
 const extend = require('extend');
-const Cmd = require('../libs/cmd');
-const settings = require('./settings');
+const Cmd = require('../cmd');
+const settings = require('../settings');
 
 let _clocks = {};
 let isRunning = false;
 let cache = [];
 
+const UPDATE_DELAY = 15 * 1000;
 
 exports.start = () => {
     isRunning = true;
-    // start all watch
+    cache.forEach(service => setTimeout(() => loop(service)));
 };
 
 exports.stop = () => {
     isRunning = false;
-    // remove all watch
+    cache.forEach(service => clearTimeout(service._clock))
 };
 
 exports.snapshot = appId => {
@@ -31,7 +32,6 @@ exports.snapshot = appId => {
 };
 
 exports.registerService = (appId, serviceId, info) => {
-    // console.log('regiter ser', appId, serviceId);
 
     let service = cache
         .filter(_ => _.appId === appId && _.serviceId === serviceId)
@@ -47,10 +47,14 @@ exports.registerService = (appId, serviceId, info) => {
             _clock: null,
         };
         cache.push(service);
-        setTimeout(() => loop(service));
     }
 
     service.data = extend(service.data, info);
+
+    // start loop if the service is sleeping
+    if (!service._clock) {
+        setTimeout(() => loop(service));
+    }
 };
 
 const loop = service => {
@@ -68,7 +72,7 @@ const nextTick = service => {
     if (!isRunning) {
         return;
     }
-    service._clock = setTimeout(() => loop(service), settings.getUpdateDelay());
+    service._clock = setTimeout(() => loop(service), UPDATE_DELAY);
 }
 
 const getServiceInfo = service => new Promise((resolve, reject) => {

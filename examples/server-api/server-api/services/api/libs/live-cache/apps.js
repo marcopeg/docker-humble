@@ -1,10 +1,12 @@
 
 const extend = require('extend');
 const yaml = require('node-yaml');
-const Cmd = require('../libs/cmd');
+const Cmd = require('../cmd');
 
-const settings = require('./settings');
+const settings = require('../settings');
 const services = require('./services');
+
+const UPDATE_DELAY = 30 * 1000;
 
 let _clocks = {};
 let isRunning = false;
@@ -12,12 +14,12 @@ let cache = {};
 
 exports.start = () => {
     isRunning = true;
-    // start all watch
+    Object.keys(cache).forEach(appId => setTimeout(() => loop(appId)));
 };
 
 exports.stop = () => {
     isRunning = false;
-    // remove all watch
+    Object.keys(_clocks).forEach(appId => clearTimeout(_clocks[appId]));
 };
 
 exports.snapshot = () => {
@@ -73,7 +75,7 @@ const nextTick = appId => {
     if (!isRunning) {
         return;
     }
-    _clocks[appId] = setTimeout(() => loop(appId), settings.getUpdateDelay());
+    _clocks[appId] = setTimeout(() => loop(appId), UPDATE_DELAY);
 }
 
 const getAppConfiguration = appId => new Promise((resolve, reject) => {
