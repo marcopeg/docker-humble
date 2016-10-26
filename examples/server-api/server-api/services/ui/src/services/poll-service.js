@@ -2,7 +2,7 @@
 import { post } from 'utils/api';
 import { setError, setCache } from 'actions/app-actions';
 
-const POLL_INTERVAL = 5000;
+const POLL_INTERVAL = 2500;
 let isPolling, _pollingTimer;
 
 export const start = () => dispatch => {

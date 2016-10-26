@@ -40,5 +40,5 @@ processCmd() {
 # Run it forever
 while true; do
     processCmd
-    sleep 1
+    sleep .25
 done

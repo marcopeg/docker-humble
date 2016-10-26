@@ -62,7 +62,7 @@ function waitForFile(filePath, timeout) {
                     if (Date.now() - startTs >= timeout) {
                         reject('timeout');
                     } else {
-                        setTimeout(loop, 100);
+                        setTimeout(loop, 300);
                     }
                 } else {
                     resolve(filePath);
