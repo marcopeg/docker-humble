@@ -5,6 +5,13 @@ var path = require('path');
 var BUILD_DIR = path.resolve(__dirname, 'build');
 var APP_DIR = path.resolve(__dirname, 'src');
 
+var webpackEnv = {};
+Object.keys(process.env)
+    .filter(key => key.toLowerCase().toUpperCase() === key)
+    .forEach(key => {
+        webpackEnv[key] = JSON.stringify(process.env[key]);
+    });
+
 var config = {
     entry: {
         app: APP_DIR + '/app.js',
@@ -68,10 +75,7 @@ var config = {
     },
     plugins: [
         new webpack.DefinePlugin({
-            // 'process.env': JSON.stringify(process.env),
-            'process.env': {
-               'NODE_ENV': JSON.stringify('production'),
-           },
+            'process.env': webpackEnv,
         }),
     ],
     babel: {
