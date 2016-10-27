@@ -22,10 +22,3 @@ const Root = ({ store, app }) => (
 )
 
 render((<Root store={store} app={Router} />), targetEl);
-
-if (module.hot) {
-    module.hot.accept('containers/App', () => {
-        const Router = require('containers/Router').default;
-        render((<Root store={store} app={Router} />), targetEl);
-    });
-}

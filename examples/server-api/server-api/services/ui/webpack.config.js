@@ -2,7 +2,7 @@
 var webpack = require('webpack');
 var path = require('path');
 
-var BUILD_DIR = path.resolve(__dirname);
+var BUILD_DIR = path.resolve(__dirname, 'build');
 var APP_DIR = path.resolve(__dirname, 'src');
 
 var config = {
@@ -68,7 +68,10 @@ var config = {
     },
     plugins: [
         new webpack.DefinePlugin({
-            'process.env': JSON.stringify(process.env),
+            // 'process.env': JSON.stringify(process.env),
+            'process.env': {
+               'NODE_ENV': JSON.stringify('production'),
+           },
         }),
     ],
     babel: {
@@ -98,6 +101,7 @@ if ('production' === process.env.NODE_ENV) {
             warnings: false,
         },
     }));
+    config.plugins.push(new webpack.optimize.DedupePlugin());
 }
 
 module.exports = config;
