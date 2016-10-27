@@ -58,7 +58,7 @@ const nextTick = () => {
 }
 
 const getProxyConfiguration = data => new Promise((resolve, reject) => {
-    const yamlFilePath = path.join('/server-root', 'humble-server.yml')
+    const yamlFilePath = path.join('/humble-server', 'humble-server.yml')
     fs.readFile(yamlFilePath, 'utf-8', (err, content) => {
         if (err) {
             return reject(err);

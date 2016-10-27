@@ -4,8 +4,8 @@ const path = require('path');
 const microseconds = require('microseconds');
 
 const operationTimeout = 60 * 1000;
-const queuePath = '/server-api/queue';
-const historyPath = '/server-api/history';
+const queuePath = '/humble-server/.humble-server/api/queue';
+const historyPath = '/humble-server/.humble-server/api/history';
 
 const queue = require('./cmd-queue');
 
@@ -35,7 +35,7 @@ class Cmd {
             queue.isReady()
                 .then(queueTicket => {
                     this.queueTicket = queueTicket;
-                    fs.writeFile(path.join('/', 'server-api', 'queue', this.cmdFileName), this.cmd, 'utf8', err => {
+                    fs.writeFile(path.join(queuePath, this.cmdFileName), this.cmd, 'utf8', err => {
                         if (err) {
                             _reject(err);
                         } else {
@@ -62,7 +62,7 @@ function waitForFile(filePath, timeout) {
                     if (Date.now() - startTs >= timeout) {
                         reject('timeout');
                     } else {
-                        setTimeout(loop, 300);
+                        setTimeout(loop, 250);
                     }
                 } else {
                     resolve(filePath);

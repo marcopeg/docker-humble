@@ -2,11 +2,6 @@ version: '2'
 services:
     api:
         volumes:
-            - ../:/server-root
-            - ../.humble-server/api:/server-api
-        environment:
-            - NODE_ENV=${NODE_ENV}
-
-    ui:
+            - ../:/humble-server
         environment:
             - NODE_ENV=${NODE_ENV}
