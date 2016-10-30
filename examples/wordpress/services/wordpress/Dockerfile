@@ -2,7 +2,7 @@
 # Wordpress for Production
 # by @24HR
 
-FROM wordpress:latest
+FROM wordpress:4.6
 
 # Add custom theme
 VOLUME /var/www/html/wp-content/themes/docker
