@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCRIPT_CWD=$(dirname $(stat -f %Y $(which humble)))
+SCRIPT_CWD=$(dirname $(readlink -n ${BASH_SOURCE[0]}))
 PROJCT_CWD="$PWD"
 
 # Environment variables files
