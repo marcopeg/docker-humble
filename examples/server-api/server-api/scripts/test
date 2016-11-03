@@ -1,2 +1,0 @@
-./humble up -d --build
-./humble exec api npm test

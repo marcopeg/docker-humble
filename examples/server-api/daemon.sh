@@ -1,4 +1,4 @@
-#! /bin/sh
+#!/bin/bash
 
 trap processUserSig SIGUSR1
 processUserSig() {
@@ -11,6 +11,10 @@ API_ROOT="$CONFIG_ROOT""/api"
 API_QUEUE="$API_ROOT""/queue"
 API_STDOUT="$API_ROOT""/stdout"
 API_HISTORY="$API_ROOT""/history"
+
+mkdir -p "$API_QUEUE"
+mkdir -p "$API_STDOUT"
+mkdir -p "$API_HISTORY"
 
 getLastCmd() {
     find "$API_QUEUE" -maxdepth 1 -type f | head -n 1
